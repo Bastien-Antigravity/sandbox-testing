@@ -1,0 +1,22 @@
+name: "Ecosystem Heartbeat (Hello World)"
+description: "A foundational scenario to verify that the core architecture can spin up and accept connections."
+version: "1.0.0"
+
+steps:
+  - action: "start_service"
+    service: "config-server"
+    args: ["go", "run", "cmd/config-server/main.go"]
+    description: "Launch the central configuration distributor."
+
+  - action: "wait"
+    duration: 5
+    description: "Allow time for gRPC server binding and profile loading."
+
+  - action: "start_service"
+    service: "log-server"
+    args: ["cargo", "run"]
+    description: "Launch the Rust-based logging engine."
+
+  - action: "wait"
+    duration: 5
+    description: "Awaiting service discovery synchronization."
