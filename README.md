@@ -1,3 +1,12 @@
+---
+microservice: sandbox-testing
+type: repository
+status: active
+language: python
+tags:
+  - domain/testing
+---
+
 # Sandbox Testing: AI-Driven Quality Assurance
 
 This repository is the central hub for integration testing, behavior validation, and AI-generated scenarios for the Bastien-Antigravity ecosystem.
