@@ -2,11 +2,16 @@
 microservice: sandbox-testing
 type: session-state
 status: active
+directives:
+  - autonomous-doc-sync: mandatory
+  - obsidian-brain-sync: mandatory
+  - conventional-commits: mandatory
 ---
 
 # 🧠 AI Session State: sandbox-testing
 
-This document tracks local status, implementation context, and pending tasks for the **sandbox-testing** service.
+> [!IMPORTANT] CORE OPERATING DIRECTIVE
+> I am autonomously obligated to update all associated documentation (**README.md**, **ARCHITECTURE.md**) and relevant **Obsidian Brain** nodes after every code modification. No manual user reminder is required.
 
 ## 🚀 Progress Tracking
 - [x] Initialized session state tracking for this repository.
@@ -17,3 +22,4 @@ This document tracks local status, implementation context, and pending tasks for
 
 ## ⏭ Next Actions
 - [ ] Maintain this state file during development sprints!
+
