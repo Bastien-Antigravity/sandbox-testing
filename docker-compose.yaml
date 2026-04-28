@@ -1,0 +1,139 @@
+services:
+  timescale-db:
+    image: timescale/timescaledb-ha:pg18
+    container_name: sandbox-timescale-db
+    restart: unless-stopped
+    networks:
+      sandbox_net:
+        aliases:
+          - timescale-db
+    environment:
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=maindb
+      - POSTGRES_USER=dbuser
+      - POSTGRES_PASSWORD=dbuser
+      - TIMESCALEDB_TELEMETRY=off
+    ports:
+      - "5432:5432"
+    volumes:
+      - sandbox_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U dbuser -d maindb" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  nats-server:
+    image: nats:2.12.6-alpine3.22
+    container_name: sandbox-nats-server
+    restart: unless-stopped
+    networks:
+      sandbox_net:
+        aliases:
+          - nats-server
+    command: [ "--config", "/etc/nats/nats.conf" ]
+    ports:
+      - "4222:4222"
+      - "8222:8222"
+    volumes:
+      - ./nats.conf:/etc/nats/nats.conf:ro
+      - sandbox_natsdata:/data
+    healthcheck:
+      test: [ "CMD-SHELL", "wget -q --spider http://localhost:8222/healthz || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  log-server:
+    build:
+      context: ../log-server
+    container_name: sandbox-log-server
+    restart: unless-stopped
+    networks:
+      sandbox_net:
+        aliases:
+          - log-server
+    ports:
+      - "9020:9020"
+
+  config-server:
+    build:
+      context: ../config-server
+    container_name: sandbox-config-server
+    restart: unless-stopped
+    depends_on:
+      log-server:
+        condition: service_started
+    networks:
+      sandbox_net:
+        aliases:
+          - config-server
+    environment:
+      - LS_IP=log-server
+      - CF_IP=0.0.0.0
+    ports:
+      - "3306:3306"
+
+  notif-server:
+    build:
+      context: ../notif-server
+    container_name: sandbox-notif-server
+    restart: unless-stopped
+    depends_on:
+      log-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+    networks:
+      sandbox_net:
+        aliases:
+          - notif-server
+    environment:
+      - LS_IP=log-server
+      - CF_IP=config-server
+    ports:
+      - "1026:1026"
+
+  tele-remote:
+    build:
+      context: ../tele-remote
+    container_name: sandbox-tele-remote
+    restart: unless-stopped
+    depends_on:
+      log-server:
+        condition: service_started
+      config-server:
+        condition: service_started
+      nats-server:
+        condition: service_healthy
+    networks:
+      sandbox_net:
+        aliases:
+          - tele-remote
+    environment:
+      - LS_IP=log-server
+      - CF_IP=config-server
+    ports:
+      - "50051:50051"
+    volumes:
+      - ./private.pem:/etc/bastien/private.pem:ro
+
+  test-orchestrator:
+    build:
+      context: ./orchestrator
+    container_name: sandbox-test-orchestrator
+    profiles: [ "test" ]
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ../:/workspace
+    working_dir: /workspace/testing-sandbox/scenarios
+    networks:
+      - sandbox_net
+
+networks:
+  sandbox_net:
+
+
+volumes:
+  sandbox_pgdata:
+  sandbox_natsdata:
