@@ -24,15 +24,15 @@ The sandbox supports two primary execution modes for your testing scenarios:
 
 ## 🛠️ Tools
 
-*   **`tools/bastien_scenario.py`**: The multi-mode scenario runner. It parses behavioral specs from the `scenarios/` directory and orchestrates the environment.
+*   **`tools/scenario_orchestrator.py`**: The multi-mode scenario runner. It parses behavioral specs from the `scenarios/` directory and orchestrates the environment.
 
 ### Usage
 ```powershell
 # Run the Hello World scenario in Native mode
-python tools/bastien_scenario.py scenarios/hello_world.yaml --mode native
+python tools/scenario_orchestrator.py scenarios/hello_world.yaml --mode native
 
 # Run the same scenario using Docker Compose
-python tools/bastien_scenario.py scenarios/hello_world.yaml --mode docker
+python tools/scenario_orchestrator.py scenarios/hello_world.yaml --mode docker
 ```
 
 ---
@@ -45,4 +45,4 @@ This sandbox is designed to work natively with the Antigravity AI assistant. You
 *   *"Antigravity, analyze the universal-logger docs and generate a stress-test scenario in the sandbox."*
 *   *"Antigravity, create a scenario that verifies the gRPC lifecycle methods (Start/Stop) for the config-server."*
 
-The AI will generate a YAML file in `scenarios/` which you can then execute using the `bastien_scenario.py` tool.
+The AI will generate a YAML file in `scenarios/` which you can then execute using the `scenario_orchestrator.py` tool.

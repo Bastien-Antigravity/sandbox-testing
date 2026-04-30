@@ -24,7 +24,7 @@ from os.path import exists as osPathExists
 from sys import exit as sysExit
 from time import sleep as timeSleep
 from pathlib import Path as pathlibPath
-from typing import List, Any, Optional
+from typing import List, Any
 
 
 class ScenarioRunner:
