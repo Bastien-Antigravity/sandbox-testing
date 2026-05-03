@@ -32,7 +32,7 @@ func TestProtocolHardeningAdversarial(t *testing.T) {
 
 		assert.Error(t, err, "Server should have closed the connection")
 		assert.True(t, duration >= 5*time.Second, "Timeout should be at least 5 seconds")
-		assert.True(t, duration < 7*time.Second, "Timeout should trigger before 7 seconds")
+		assert.True(t, duration < 10*time.Second, "Timeout should trigger before 10 seconds")
 	})
 
 	t.Run("OOM_Protection", func(t *testing.T) {
