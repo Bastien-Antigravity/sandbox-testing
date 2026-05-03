@@ -1,0 +1,17 @@
+# Feature: Bootstrapping Fallback
+# Spec: [[business-bdd-brain/02-Behavior-Specs/FEAT-009-Config-Resilience]]
+# Implementation: implementations/go/config_resilience_test.go
+
+name: "Bootstrapping Fallback Logic"
+description: "Verifies that log-server can start using local standalone.yaml when the Config Server is unreachable."
+version: "1.0.0"
+
+steps:
+  - action: "start_service"
+    service: "log-server"
+    args: "cargo run -- --name ResilienceTest"
+    description: "Launch log-server WITHOUT launching config-server first."
+
+  - action: "wait"
+    duration: 5
+    description: "Allowing time for toolbox to timeout on bridge and fallback to native file."

@@ -7,42 +7,53 @@ tags:
   - domain/testing
 ---
 
-# Sandbox Testing: AI-Driven Quality Assurance
+# Sandbox Testing: BDD-Driven Quality Assurance
 
-This repository is the central hub for integration testing, behavior validation, and AI-generated scenarios for the Bastien-Antigravity ecosystem.
+This repository is the central hub for integration testing, behavior validation, and adversarial protocol hardening for the Bastien-Antigravity ecosystem. It follows a strict **BDD-Oriented** structure to separate feature definitions from technical implementations.
 
-## 🚀 Getting Started
+## 📂 Directory Structure
 
-The sandbox supports two primary execution modes for your testing scenarios:
+*   **`features/`**: High-level BDD scenario definitions (YAML). Each file is **bound** to a Business Spec via metadata headers.
+*   **`implementations/`**: Polyglot code (Go, Python) that realizes the feature scenarios.
+*   **`infra/`**: Infrastructure and orchestration plumbing.
+    *   `config/`: Docker Compose and NATS configurations.
+    *   `orchestrator/`: The core logic for the scenario runner.
+*   **`bin/`**: Standard execution scripts and entry points.
+*   **`results/`**: Standardized directory for test reports and artifacts.
 
-### 🎮 Execution Modes
+## 🚀 Execution Guide
 
-1.  **Native Mode (`--mode native`)**: Runs individual service binaries directly on your machine. Ideal for rapid development and debugging. It requires that your `go.work` and local builds are correctly configured.
-2.  **Docker Mode (`--mode docker`)**: Orchestrates the entire ecosystem using the configurations in `docker-deployment`. Ideal for verifying production-like networking and service discovery.
+### 🛡️ QA Hardening Validation (Adversarial)
 
----
+The sandbox includes a dedicated adversarial test suite to verify the security and resilience of the `log-server` protocol.
 
-## 🛠️ Tools
-
-*   **`tools/scenario_orchestrator.py`**: The multi-mode scenario runner. It parses behavioral specs from the `scenarios/` directory and orchestrates the environment.
-
-### Usage
-```powershell
-# Run the Hello World scenario in Native mode
-python tools/scenario_orchestrator.py scenarios/hello_world.yaml --mode native
-
-# Run the same scenario using Docker Compose
-python tools/scenario_orchestrator.py scenarios/hello_world.yaml --mode docker
+Run the hardening suite:
+```bash
+go test -v ./implementations/go/protocol_adversarial_test.go
 ```
 
----
+### 🎮 Scenario Orchestration
+
+The `scenario_orchestrator.py` tool manages the lifecycle of your tests across two primary modes:
+
+1.  **Native Mode (`--mode native`)**: Runs binaries directly on your machine. Ideal for rapid development.
+2.  **Docker Mode (`--mode docker`)**: Orchestrates the entire ecosystem using Docker Compose.
+
+**Usage:**
+```bash
+# Run the Hello World scenario in Native mode
+python infra/orchestrator/tools/scenario_orchestrator.py features/FEAT-000-hello-world.yaml --mode native
+
+# Run the same scenario using Docker Compose
+python infra/orchestrator/tools/scenario_orchestrator.py features/FEAT-000-hello-world.yaml --mode docker
+```
 
 ## 🤖 AI Interaction Workflow
 
-This sandbox is designed to work natively with the Antigravity AI assistant. You can request complex testing scenarios by referencing existing documentation and features.
+This sandbox is designed to work natively with the Antigravity AI assistant. You can request complex testing scenarios by referencing existing features.
 
 **Example Prompts:**
-*   *"Antigravity, analyze the universal-logger docs and generate a stress-test scenario in the sandbox."*
-*   *"Antigravity, create a scenario that verifies the gRPC lifecycle methods (Start/Stop) for the config-server."*
+*   *"Antigravity, generate a stress-test scenario in features/ for the universal-logger."*
+*   *"Antigravity, implement a new Go step in implementations/go/ to verify the gRPC Log Bridge."*
 
-The AI will generate a YAML file in `scenarios/` which you can then execute using the `scenario_orchestrator.py` tool.
+The AI will generate YAML files in `features/` and implementations in `implementations/`, keeping the repository clean and scalable.

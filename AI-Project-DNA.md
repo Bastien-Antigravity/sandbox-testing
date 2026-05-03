@@ -11,10 +11,10 @@
     - Maintain clean state resets between test scenarios.
 - **QA**: 
     - Design complex, multi-service scenarios that verify edge cases (e.g., partial failure, latency injection).
-    - Ensure that all AI-generated scenarios in `scenarios/` follow the standardized YAML schema.
+    - Ensure that all feature definitions in `features/` follow the standardized YAML schema.
 - **Developer**:
-    - Add new "Orchestrator Plugins" for new microservice types.
-    - Follow the Python coding rules for all tools in `tools/`.
+    - Implement new test logic in `steps/` (Go/Python).
+    - Maintain the orchestration infrastructure in `infra/`.
 
 ## 🚦 Lifecycle & Versioning
 - **Primary Branch**: `develop`

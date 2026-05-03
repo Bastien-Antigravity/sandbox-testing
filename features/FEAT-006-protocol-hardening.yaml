@@ -1,0 +1,29 @@
+# Feature: Protocol Hardening & Adversarial Resilience
+# Spec: [[business-bdd-brain/02-Behavior-Specs/FEAT-006-Log-Server-Protocol-Hardening]]
+# Implementation: implementations/go/protocol_adversarial_test.go
+
+name: "Protocol Hardening Validation"
+description: "Adversarial tests to verify the resilience of the log-server against OOM, Slow-Loris, and Handshake Bypass."
+version: "1.0.0"
+
+steps:
+  - name: "Start Hardened Log-Server"
+    action: "start_service"
+    service: "log-server"
+    args: "cargo run -- --port 15000 --grpc-port 15001"
+
+  - name: "Wait for Bootstrap"
+    action: "wait"
+    duration: 5
+
+  - name: "Verify Handshake Timeout"
+    description: "Ensure the server closes connections that don't identify within 5s."
+    step: "implementations/go/protocol_adversarial_test.go::TestProtocolHardeningAdversarial/Timeout_Protection"
+
+  - name: "Verify OOM Protection"
+    description: "Ensure the server rejects message prefixes > 10MB."
+    step: "implementations/go/protocol_adversarial_test.go::TestProtocolHardeningAdversarial/OOM_Protection"
+
+  - name: "Verify Handshake Enforcement"
+    description: "Ensure no data can be sent before a valid identity handshake."
+    step: "implementations/go/protocol_adversarial_test.go::TestProtocolHardeningAdversarial/Handshake_Bypass_Protection"

@@ -65,9 +65,34 @@ class ScenarioRunner:
     def run_docker(self, compose_file: str) -> None:
         self.log(f"Starting orchestration in DOCKER mode using {compose_file}...")
         try:
+            # Use docker-compose up -d to start the environment
             subprocessRun(["docker-compose", "-f", compose_file, "up", "-d"], check=True)
         except Exception as e:
             raise RuntimeError(f"Sandbox (Python): Error starting docker-compose: {e}")
+
+    # -----------------------------------------------------------------------------------------------
+
+    def run_implementation(self, step_path: str) -> None:
+        """Executes a technical implementation (e.g. Go test) bound to a feature."""
+        self.log(f"Running implementation: {step_path}")
+        
+        # Parse language and test name (e.g. implementations/go/test.go::TestName)
+        parts = step_path.split("::")
+        file_path = self.workspace_root / "sandbox-testing" / parts[0]
+        
+        if not file_path.exists():
+            raise FileNotFoundError(f"Implementation file not found: {file_path}")
+
+        if file_path.suffix == ".go":
+            # Execute Go test
+            cmd = ["go", "test", "-v", str(file_path)]
+            if len(parts) > 1:
+                cmd.extend(["-run", parts[1]])
+            
+            # Run from the directory of the go.mod (implementations/go/)
+            subprocessRun(cmd, cwd=str(file_path.parent), check=True)
+        elif file_path.suffix == ".py":
+            subprocessRun(["python3", str(file_path)], check=True)
 
     # -----------------------------------------------------------------------------------------------
 
@@ -77,7 +102,7 @@ class ScenarioRunner:
             for p in self.processes:
                 p.terminate()
         elif self.mode == "docker":
-             # We might not want to stop everything automatically if the user wants to inspect logs
+             # We might not want to stop everything automatically
              pass
 
     # -----------------------------------------------------------------------------------------------
@@ -87,26 +112,38 @@ class ScenarioRunner:
             raise FileNotFoundError(f"Sandbox (Python): Scenario file '{scenario_path}' not found")
 
         with open(scenario_path, "r") as f:
+            lines = f.readlines()
+            # Extract spec link for self-explanatoriness
+            spec_link = next((line.split("Spec: ")[1].strip() for line in lines if "Spec: " in line), "Unknown")
+            f.seek(0)
             scenario = yamlSafeLoad(f)
 
-        self.log(f"Executing Scenario: {scenario.get('name', 'Unnamed Scenario')}")
+        self.log(f"🚀 Executing Scenario: {scenario.get('name', 'Unnamed Scenario')}")
+        self.log(f"📖 Business Specification: {spec_link}")
         
         if self.mode == "docker":
-            compose_path = self.workspace_root / "docker-deployment" / "docker-compose.yaml"
+            # Correct path relative to the workspace root
+            compose_path = self.workspace_root / "sandbox-testing" / "infra" / "config" / "docker-compose.yaml"
             self.run_docker(str(compose_path))
-        else:
-            for step in scenario.get("steps", []):
-                action = step.get("action")
-                if action == "start_service":
-                    svc = step.get("service")
-                    args = step.get("args", [])
-                    self.run_native(svc, args)
-                elif action == "wait":
-                    duration = step.get("duration", 1)
-                    self.log(f"Waiting for {duration} seconds...")
-                    timeSleep(duration)
+        
+        # Execute steps (Works in both modes, though native starts services first)
+        for step in scenario.get("steps", []) or scenario.get("scenario", []):
+            action = step.get("action")
+            if action == "start_service":
+                svc = step.get("service")
+                args = step.get("args", "")
+                self.run_native(svc, args)
+            elif action == "wait":
+                duration = step.get("duration", 1)
+                self.log(f"Waiting for {duration} seconds...")
+                timeSleep(duration)
+            
+            # BDD Implementation execution
+            impl = step.get("step")
+            if impl:
+                self.run_implementation(impl)
 
-        self.log("Scenario execution complete.")
+        self.log("✅ Scenario execution complete.")
 
 
 # ###################################################################################################

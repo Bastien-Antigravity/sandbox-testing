@@ -46,7 +46,7 @@ services:
 
   log-server:
     build:
-      context: ../log-server
+      context: ../../../log-server
     container_name: sandbox-log-server
     restart: unless-stopped
     networks:
@@ -54,11 +54,12 @@ services:
         aliases:
           - log-server
     ports:
-      - "9020:9020"
+      - "15000:15000"
+      - "15001:15001"
 
   config-server:
     build:
-      context: ../config-server
+      context: ../../../config-server
     container_name: sandbox-config-server
     restart: unless-stopped
     depends_on:
@@ -76,7 +77,7 @@ services:
 
   notif-server:
     build:
-      context: ../notif-server
+      context: ../../../notif-server
     container_name: sandbox-notif-server
     restart: unless-stopped
     depends_on:
@@ -96,7 +97,7 @@ services:
 
   tele-remote:
     build:
-      context: ../tele-remote
+      context: ../../../tele-remote
     container_name: sandbox-tele-remote
     restart: unless-stopped
     depends_on:
@@ -120,13 +121,13 @@ services:
 
   test-orchestrator:
     build:
-      context: ./orchestrator
+      context: ../orchestrator/orchestrator
     container_name: sandbox-test-orchestrator
     profiles: [ "test" ]
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ../:/workspace
-    working_dir: /workspace/testing-sandbox/scenarios
+      - ../../../:/workspace
+    working_dir: /workspace/sandbox-testing/features
     networks:
       - sandbox_net
 
