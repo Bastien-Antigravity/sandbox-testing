@@ -5,6 +5,8 @@ on:
     branches: [ develop, main ]
   pull_request:
     branches: [ develop, main ]
+  repository_dispatch:
+    types: [fleet-event]
 
 jobs:
   validate:
