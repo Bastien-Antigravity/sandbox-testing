@@ -4,7 +4,7 @@ go 1.25.4
 
 require (
 	github.com/Bastien-Antigravity/microservice-toolbox/go v1.2.2
-	github.com/Bastien-Antigravity/universal-logger v0.0.0
+	github.com/Bastien-Antigravity/universal-logger v1.4.2
 	github.com/stretchr/testify v1.11.1
 )
 
@@ -23,13 +23,3 @@ require (
 	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/Bastien-Antigravity/distributed-config => ../../../distributed-config
-
-replace github.com/Bastien-Antigravity/universal-logger => ../../../universal-logger
-
-replace github.com/Bastien-Antigravity/microservice-toolbox/go => ../../../microservice-toolbox/go
-
-replace github.com/Bastien-Antigravity/safe-socket => ../../../safe-socket
-
-replace github.com/Bastien-Antigravity/flexible-logger => ../../../flexible-logger
