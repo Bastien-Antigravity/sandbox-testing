@@ -1,45 +1,11 @@
-name: CI Standard Pipeline
-
+name: Fleet CI
 on:
   push:
     branches: [ develop, main ]
   pull_request:
     branches: [ develop, main ]
-  repository_dispatch:
-    types: [fleet-event]
 
 jobs:
-  validate:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      # Go Validation
-      - name: Set up Go
-        uses: actions/setup-go@v5
-        with:
-          go-version: '1.25'
-      - name: Go Lint & Test
-        run: |
-          cd implementations/go
-          go fmt ./...
-          # Note: tests are skipped in CI because they require sibling repos (replace directives)
-          go build -v ./...
-
-      # Python Validation
-      - name: Set up Python
-        if: hashFiles('requirements.txt') != ''
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.11'
-      - name: Python Lint & Test
-        if: hashFiles('requirements.txt') != ''
-        run: |
-          pip install pytest pyyaml
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-          # pytest --version # Verify it's installed
-
-      # Sandbox Integration (Global)
-      - name: Run Sandbox Integration
-        run: echo "Triggering sandbox-testing workflow..."
-        # This would typically use a repository_dispatch or a shared action
+  fleet-ci:
+    uses: Bastien-Antigravity/fleet-operation-brain/.github/workflows/master-ci.yml@develop
+    secrets: inherit
