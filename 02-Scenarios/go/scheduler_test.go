@@ -1,4 +1,4 @@
-package go_test
+package scenarios_test
 
 import (
 	"os/exec"
