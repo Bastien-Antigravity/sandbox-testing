@@ -1,6 +1,6 @@
 # Feature: Protocol Hardening & Adversarial Resilience
-# Spec: [[business-bdd-brain/02-Behavior-Specs/FEAT-006-Log-Server-Protocol-Hardening]]
-# Implementation: implementations/go/protocol_adversarial_test.go
+# Spec: [[02-Business-BDD/02-Behavior-Specs/log-server/FEAT-006-Handshake-Identity]]
+# Implementation: 02-Scenarios/go/protocol_adversarial_test.go
 
 name: "Protocol Hardening Validation"
 description: "Adversarial tests to verify the resilience of the log-server against OOM, Slow-Loris, and Handshake Bypass."
@@ -18,12 +18,12 @@ steps:
 
   - name: "Verify Handshake Timeout"
     description: "Ensure the server closes connections that don't identify within 5s."
-    step: "implementations/go/protocol_adversarial_test.go::TestProtocolHardeningAdversarial/Timeout_Protection"
+    step: "02-Scenarios/go/protocol_adversarial_test.go::TestProtocolHardeningAdversarial/Timeout_Protection"
 
   - name: "Verify OOM Protection"
     description: "Ensure the server rejects message prefixes > 10MB."
-    step: "implementations/go/protocol_adversarial_test.go::TestProtocolHardeningAdversarial/OOM_Protection"
+    step: "02-Scenarios/go/protocol_adversarial_test.go::TestProtocolHardeningAdversarial/OOM_Protection"
 
   - name: "Verify Handshake Enforcement"
     description: "Ensure no data can be sent before a valid identity handshake."
-    step: "implementations/go/protocol_adversarial_test.go::TestProtocolHardeningAdversarial/Handshake_Bypass_Protection"
+    step: "02-Scenarios/go/protocol_adversarial_test.go::TestProtocolHardeningAdversarial/Handshake_Bypass_Protection"

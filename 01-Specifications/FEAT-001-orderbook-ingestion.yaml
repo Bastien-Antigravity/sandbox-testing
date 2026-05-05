@@ -1,0 +1,26 @@
+# Spec: [[02-Business-BDD/02-Behavior-Specs/orderbook-aggregator/FEAT-001-Orderbook-Ingestion]]
+# Implementation: 02-Scenarios/go/orderbook_ingestion_test.go
+
+feature: Orderbook Ingestion
+  description: High-fidelity Binance WebSocket ingestion with normalization and resilience.
+  priority: high
+  scenarios:
+    - name: Binance Connection
+      given: market-observer is healthy
+      when: binance-ingestor starts
+      then: secure websocket established and subscribed
+
+    - name: Normalization Latency
+      given: raw depth events received
+      when: data-ingestor processes events
+      then: mapping to OrderbookEvent < 5ms
+
+    - name: Resilience & Recovery
+      given: network failure occurs
+      when: reconnect sequence triggered
+      then: exponential backoff enforced
+
+    - name: Heartbeat Enforcement
+      given: stale socket (no data for 30s)
+      when: watchdog timeout expires
+      then: connection recycled

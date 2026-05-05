@@ -1,0 +1,27 @@
+# Feature: Hello World Ingestion
+# Spec: [[02-Business-BDD/02-Behavior-Specs/sandbox-testing/FEAT-000-System-Bootstrap]]
+# Implementation: 02-Scenarios/go/concurrency_chaos_test.go (example)
+
+name: "Ecosystem Heartbeat (Hello World)"
+scenario: "Verify basic log ingestion across the fleet"
+description: "A foundational scenario to verify that the core architecture can spin up and accept connections."
+version: "1.0.0"
+
+steps:
+  - action: "start_service"
+    service: "log-server"
+    args: ["cargo", "run"]
+    description: "Launch the Rust-based logging engine."
+
+  - action: "wait"
+    duration: 5
+    description: "Allow time for TCP and gRPC server binding."
+
+  - action: "start_service"
+    service: "config-server"
+    args: ["go", "run", "cmd/config-server/main.go"]
+    description: "Launch the central configuration distributor."
+
+  - action: "wait"
+    duration: 5
+    description: "Awaiting service discovery synchronization."

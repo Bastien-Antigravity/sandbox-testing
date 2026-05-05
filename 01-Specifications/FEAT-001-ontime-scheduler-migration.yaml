@@ -1,0 +1,13 @@
+# 🧪 Scenario: Ontime Scheduler Migration Validation
+# Spec: [[02-Business-BDD/02-Behavior-Specs/ontime-scheduler/FEAT-001-Go-Migration]]
+
+name: "Scheduler Go-Migration Graduation"
+description: "Verify that the new Go engine can trigger legacy Python scripts with parity."
+
+steps:
+  - action: "wait"
+    duration: 1
+    description: "Initialize test environment."
+
+  - step: "02-Scenarios/go/scheduler_test.go::TestLegacyPythonExecution"
+    description: "Execute the Go test suite for legacy script triggers."

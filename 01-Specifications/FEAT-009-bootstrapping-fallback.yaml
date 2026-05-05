@@ -1,6 +1,6 @@
 # Feature: Bootstrapping Fallback
-# Spec: [[business-bdd-brain/02-Behavior-Specs/FEAT-009-Config-Resilience]]
-# Implementation: implementations/go/config_resilience_test.go
+# Spec: [[02-Business-BDD/02-Behavior-Specs/log-server/FEAT-009-Ecosystem-Bootstrapping]]
+# Implementation: 02-Scenarios/go/config_resilience_test.go
 
 name: "Bootstrapping Fallback Logic"
 description: "Verifies that log-server can start using local standalone.yaml when the Config Server is unreachable."

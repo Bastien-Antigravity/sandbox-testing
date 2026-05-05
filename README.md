@@ -1,59 +1,48 @@
 ---
-microservice: sandbox-testing
+title: "Sandbox Testing Hub"
 type: repository
 status: active
-language: python
-tags:
-  - domain/testing
+microservice: sandbox-testing
 ---
 
-# Sandbox Testing: BDD-Driven Quality Assurance
+# 🧪 Sandbox Testing Hub
 
-This repository is the central hub for integration testing, behavior validation, and adversarial protocol hardening for the Bastien-Antigravity ecosystem. It follows a strict **BDD-Oriented** structure to separate feature definitions from technical implementations.
+The central command for validation, resilience testing, and chaos engineering across the Bastien-Antigravity fleet.
 
-## 📂 Directory Structure
+## 📐 Project Structure (The 2-Digit Standard)
 
-*   **`features/`**: High-level BDD scenario definitions (YAML). Each file is **bound** to a Business Spec via metadata headers.
-*   **`implementations/`**: Polyglot code (Go, Python) that realizes the feature scenarios.
-*   **`infra/`**: Infrastructure and orchestration plumbing.
-    *   `config/`: Docker Compose and NATS configurations.
-    *   `orchestrator/`: The core logic for the scenario runner.
-*   **`bin/`**: Standard execution scripts and entry points.
-*   **`results/`**: Standardized directory for test reports and artifacts.
+This repository follows a structured boundary system to ensure predictable navigation and high maintainability:
 
-## 🚀 Execution Guide
+- **`00-Environment`**: Infrastructure as Code (Docker Compose, NATS configurations, and network topologies).
+- **`01-Specifications`**: BDD-style YAML files defining the "What" (Business Scenarios).
+- **`02-Scenarios`**: Technical implementations in Go, Rust, or Python defining the "How" (Validation Logic).
+- **`03-Orchestration`**: Management scripts and the `scenario_orchestrator.py` that ties everything together.
+- **`04-Reporting`**: Centralized output for logs, test results, and performance audit trails.
 
-### 🛡️ QA Hardening Validation (Adversarial)
+## 🚀 Quick Start
 
-The sandbox includes a dedicated adversarial test suite to verify the security and resilience of the `log-server` protocol.
-
-Run the hardening suite:
+### 1. List available scenarios
 ```bash
-go test -v ./implementations/go/protocol_adversarial_test.go
+make list
 ```
 
-### 🎮 Scenario Orchestration
-
-The `scenario_orchestrator.py` tool manages the lifecycle of your tests across two primary modes:
-
-1.  **Native Mode (`--mode native`)**: Runs binaries directly on your machine. Ideal for rapid development.
-2.  **Docker Mode (`--mode docker`)**: Orchestrates the entire ecosystem using Docker Compose.
-
-**Usage:**
+### 2. Run a specific scenario (Native Mode)
 ```bash
-# Run the Hello World scenario in Native mode
-python infra/orchestrator/tools/scenario_orchestrator.py features/FEAT-000-hello-world.yaml --mode native
-
-# Run the same scenario using Docker Compose
-python infra/orchestrator/tools/scenario_orchestrator.py features/FEAT-000-hello-world.yaml --mode docker
+make test-FEAT-000-hello-world
 ```
 
-## 🤖 AI Interaction Workflow
+### 3. Run all scenarios in Docker Mode
+```bash
+make test-all MODE=docker
+```
 
-This sandbox is designed to work natively with the Antigravity AI assistant. You can request complex testing scenarios by referencing existing features.
+## 🛠️ Adding New Tests
 
-**Example Prompts:**
-*   *"Antigravity, generate a stress-test scenario in features/ for the universal-logger."*
-*   *"Antigravity, implement a new Go step in implementations/go/ to verify the gRPC Log Bridge."*
+1.  **Define the Specification**: Create a new `FEAT-XXX.yaml` in `01-Specifications/`.
+2.  **Implement the Logic**: Add the corresponding test code in `02-Scenarios/<language>/`.
+3.  **Validate**: Run your scenario using the `Makefile`.
 
-The AI will generate YAML files in `features/` and implementations in `implementations/`, keeping the repository clean and scalable.
+## 🛡️ Reliability Guarantees
+- **Atomic Cleanup**: The orchestrator ensures that all spawned processes and containers are terminated on failure or completion.
+- **Environment Isolation**: Support for Docker-mode ensures that tests run in a clean, reproducible network environment.
+- **Shared Memory Testing**: Specific support for high-throughput testing via shared-memory and safe-socket protocols.

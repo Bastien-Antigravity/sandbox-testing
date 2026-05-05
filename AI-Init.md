@@ -1,3 +1,10 @@
+---
+title: "AI Initialization: sandbox-testing"
+type: onboarding
+status: active
+microservice: sandbox-testing
+---
+
 # ⚡ AI Initialization: sandbox-testing
 
 > [!IMPORTANT] MANDATORY INITIALIZATION
