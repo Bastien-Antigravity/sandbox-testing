@@ -1,3 +1,9 @@
+---
+microservice: sandbox-testing
+type: governance
+status: active
+---
+
 # ⚡ AI Initialization: sandbox-testing
 
 > [!IMPORTANT] MANDATORY INITIALIZATION
