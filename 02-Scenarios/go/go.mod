@@ -61,3 +61,4 @@ require (
 )
 
 replace ontime-scheduler => ../../../ontime-scheduler
+replace github.com/Bastien-Antigravity/microservice-toolbox/go => ../../../microservice-toolbox/go
