@@ -1,3 +1,7 @@
+# Feature: Unified Business Data Standardization
+# Spec: [[02-Business-BDD/02-Behavior-Specs/sandbox-testing/FEAT-004-Unified-Data-Execution]]
+# Implementation: 02-Scenarios/go/full_pipeline_test.go
+
 specification:
   id: FEAT-004-Unified-Data
   title: "Unified Business Data Standardization"

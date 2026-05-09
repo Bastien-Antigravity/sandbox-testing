@@ -1,3 +1,7 @@
+# Feature: Full Data Pipeline End-to-End
+# Spec: [[02-Business-BDD/02-Behavior-Specs/sandbox-testing/FEAT-010-Full-Data-Pipeline-Execution]]
+# Implementation: 02-Scenarios/go/full_pipeline_test.go
+
 name: "Full Data Pipeline End-to-End"
 scenario: "Verify data flow from Mock Exchange to Postgres Database"
 description: "This scenario validates the entire ingestion and processing pipeline."

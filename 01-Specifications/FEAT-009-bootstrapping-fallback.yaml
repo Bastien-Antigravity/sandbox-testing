@@ -1,5 +1,5 @@
 # Feature: Bootstrapping Fallback
-# Spec: [[02-Business-BDD/02-Behavior-Specs/log-server/FEAT-009-Ecosystem-Bootstrapping]]
+# Spec: [[02-Business-BDD/02-Behavior-Specs/sandbox-testing/FEAT-009-Bootstrapping-Fallback-Execution]]
 # Implementation: 02-Scenarios/go/config_resilience_test.go
 
 name: "Bootstrapping Fallback Logic"
