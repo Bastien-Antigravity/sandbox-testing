@@ -1,0 +1,36 @@
+name: "Full Data Pipeline End-to-End"
+scenario: "Verify data flow from Mock Exchange to Postgres Database"
+description: "This scenario validates the entire ingestion and processing pipeline."
+version: "1.0.0"
+
+steps:
+  - action: "start_service"
+    service: "sandbox-testing/04-Mock-Provider"
+    args: ["go", "run", "main.go"]
+    description: "Launch the Mock Binance WebSocket server."
+
+  - action: "wait"
+    duration: 2
+    description: "Allow mock server to start."
+
+  - action: "start_service"
+    service: "market-observer"
+    args: ["go", "run", "cmd/market-observer/*.go", "--profile", "standalone"]
+    description: "Launch Market Observer to listen to NATS and write to DB."
+
+  - action: "wait"
+    duration: 5
+    description: "Allow Market Observer to initialize DB."
+
+  - action: "start_service"
+    service: "data-ingestor"
+    args: ["go", "run", "cmd/data-ingestor/main.go"]
+    description: "Launch Data Ingestor to receive data from Mock Server and publish to NATS."
+
+  - action: "wait"
+    duration: 10
+    description: "Wait for data to flow through the pipeline."
+
+  - action: "step"
+    step: "02-Scenarios/go/full_pipeline_test.go::TestFullPipeline"
+    description: "Verify the results in the database."
