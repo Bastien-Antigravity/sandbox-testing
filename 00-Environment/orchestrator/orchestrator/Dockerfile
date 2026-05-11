@@ -1,4 +1,4 @@
-FROM golang:1.25.4-alpine3.22
+FROM golang:1.25-alpine
 
 # Install Docker CLI to interact with the host Docker engine via socket
 RUN apk add --no-cache docker-cli bash git
