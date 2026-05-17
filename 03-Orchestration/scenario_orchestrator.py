@@ -55,7 +55,7 @@ class ScenarioRunner:
 
         self.log(f"Spinning up Docker infrastructure: {compose_path.name}")
         try:
-            subprocess.run(["docker-compose", "-f", str(compose_path), "up", "-d"], check=True)
+            subprocess.run(["docker", "compose", "-f", str(compose_path), "up", "-d"], check=True)
             self.active_containers = True
         except Exception as e:
             self.log(f"Docker initialization failed: {e}", "ERROR")
@@ -98,7 +98,7 @@ class ScenarioRunner:
         
         if self.active_containers:
             compose_path = self.sandbox_root / "00-Environment" / "config" / "docker-compose.yaml"
-            subprocess.run(["docker-compose", "-f", str(compose_path), "down"], check=False)
+            subprocess.run(["docker", "compose", "-f", str(compose_path), "down"], check=False)
 
     def execute(self, scenario_path: str):
         scenario_file = Path(scenario_path)

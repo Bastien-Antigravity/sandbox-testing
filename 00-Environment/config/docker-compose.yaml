@@ -4,7 +4,7 @@ services:
     container_name: sandbox-timescale-db
     restart: unless-stopped
     networks:
-      sandbox_net:
+      teleremote-network:
         aliases:
           - timescale-db
     environment:
@@ -28,7 +28,7 @@ services:
     container_name: sandbox-nats-server
     restart: unless-stopped
     networks:
-      sandbox_net:
+      teleremote-network:
         aliases:
           - nats-server
     command: [ "--config", "/etc/nats/nats.conf" ]
@@ -50,12 +50,17 @@ services:
     container_name: sandbox-log-server
     restart: unless-stopped
     networks:
-      sandbox_net:
+      teleremote-network:
         aliases:
           - log-server
     ports:
       - "15000:15000"
       - "15001:15001"
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z localhost 15000 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   config-server:
     build:
@@ -64,9 +69,9 @@ services:
     restart: unless-stopped
     depends_on:
       log-server:
-        condition: service_started
+        condition: service_healthy
     networks:
-      sandbox_net:
+      teleremote-network:
         aliases:
           - config-server
     environment:
@@ -74,6 +79,11 @@ services:
       - CF_IP=0.0.0.0
     ports:
       - "3306:3306"
+    healthcheck:
+      test: [ "CMD-SHELL", "nc -z localhost 3306 || exit 1" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   notif-server:
     build:
@@ -82,11 +92,11 @@ services:
     restart: unless-stopped
     depends_on:
       log-server:
-        condition: service_started
+        condition: service_healthy
       config-server:
-        condition: service_started
+        condition: service_healthy
     networks:
-      sandbox_net:
+      teleremote-network:
         aliases:
           - notif-server
     environment:
@@ -102,13 +112,13 @@ services:
     restart: unless-stopped
     depends_on:
       log-server:
-        condition: service_started
+        condition: service_healthy
       config-server:
-        condition: service_started
+        condition: service_healthy
       nats-server:
         condition: service_healthy
     networks:
-      sandbox_net:
+      teleremote-network:
         aliases:
           - tele-remote
     environment:
@@ -129,11 +139,11 @@ services:
       - ../../../:/workspace
     working_dir: /workspace/sandbox-testing/features
     networks:
-      - sandbox_net
+      - teleremote-network
 
 networks:
-  sandbox_net:
-
+  teleremote-network:
+    name: teleremote-network
 
 volumes:
   sandbox_pgdata:
