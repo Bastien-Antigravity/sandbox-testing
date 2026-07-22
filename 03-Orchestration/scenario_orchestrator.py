@@ -77,7 +77,7 @@ class ScenarioRunner:
 
         try:
             if file_path.suffix == ".go":
-                cmd = ["go", "test", "-v", str(file_path)]
+                cmd = ["go", "test", "-v", "."]
                 if len(parts) > 1:
                     cmd.extend(["-run", parts[1]])
                 subprocess.run(cmd, cwd=str(file_path.parent), check=True)

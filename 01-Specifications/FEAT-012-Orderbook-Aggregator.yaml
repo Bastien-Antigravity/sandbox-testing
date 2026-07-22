@@ -1,0 +1,27 @@
+name: "Orderbook Aggregator Scenario"
+scenario: "Verify Orderbook aggregation from Mock L2 Data"
+description: "Validates that the aggregator correctly maintains book state and calculates microprice."
+version: "1.0.0"
+
+steps:
+  - action: "start_service"
+    service: "sandbox-testing/04-Mock-Provider"
+    args: ["go", "run", "main.go", "--mode", "ob"]
+    description: "Launch Mock Provider in OB mode (sends orderbook updates)."
+
+  - action: "wait"
+    duration: 2
+    description: "Allow mock server to start."
+
+  - action: "start_service"
+    service: "orderbook-aggregator"
+    args: ["go", "run", "cmd/orderbook-aggregator/main.go"]
+    description: "Launch Orderbook Aggregator service."
+
+  - action: "wait"
+    duration: 5
+    description: "Wait for aggregation."
+
+  - action: "step"
+    step: "02-Scenarios/go/orderbook_aggregator_test.go::TestOrderbookAggregation"
+    description: "Verify aggregated book state in NATS."

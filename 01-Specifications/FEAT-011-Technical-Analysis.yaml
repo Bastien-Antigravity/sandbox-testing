@@ -1,0 +1,27 @@
+name: "Technical Analysis Engine Scenario"
+scenario: "Verify Indicator calculation from Mock Tick Data"
+description: "Validates that the TA engine correctly aggregates ticks into OHLCV and calculates RSI/EMA."
+version: "1.0.0"
+
+steps:
+  - action: "start_service"
+    service: "sandbox-testing/04-Mock-Provider"
+    args: ["go", "run", "main.go", "--mode", "ta"]
+    description: "Launch Mock Provider in TA mode (sends trades)."
+
+  - action: "wait"
+    duration: 2
+    description: "Allow mock server to start."
+
+  - action: "start_service"
+    service: "technical-analysis"
+    args: ["go", "run", "cmd/technical-analysis/main.go", "--profile", "sandbox"]
+    description: "Launch Technical Analysis service with sandbox profile."
+
+  - action: "wait"
+    duration: 10
+    description: "Wait for indicators to be calculated."
+
+  - action: "step"
+    step: "02-Scenarios/go/technical_analysis_test.go::TestTechnicalAnalysis"
+    description: "Verify indicators in NATS or DB."

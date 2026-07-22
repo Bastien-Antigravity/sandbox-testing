@@ -1,0 +1,9 @@
+name: "RAG Engine Database Alignment and pgvector Integration Test"
+scenario: "Verify RAG database schemas and pgvector structure creation in PostgreSQL"
+description: "Launches the RAG Engine index process in non-development mode and checks that PostgreSQL schemas, tables, and vector indexes are correctly created."
+version: "1.0.0"
+
+steps:
+  - action: "step"
+    step: "02-Scenarios/go/rag_engine_storage_test.go::TestRAGEngineStorage"
+    description: "Verify RAG PostgreSQL tables and pgvector columns."

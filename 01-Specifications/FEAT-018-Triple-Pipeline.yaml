@@ -1,0 +1,41 @@
+name: "NATS Ingestor Aggregator Analysis Triple Integration Test"
+scenario: "Verify data flow from Mock WS -> Ingestor -> Aggregator -> Technical Analysis"
+description: "This scenario validates the entire triple pipeline using NATS, data-ingestor, orderbook-aggregator, and technical-analysis."
+version: "1.0.0"
+
+steps:
+  - action: "start_service"
+    service: "sandbox-testing/04-Mock-Provider"
+    args: ["go", "run", "main.go", "--mode", "ws", "--port", "8080", "--symbol", "BTCUSDT"]
+    description: "Launch Mock Binance WebSocket server (emits trades and depth updates)."
+
+  - action: "wait"
+    duration: 2
+    description: "Allow mock WebSocket server to start."
+
+  - action: "start_service"
+    service: "data-ingestor"
+    args: ["go", "run", "cmd/data-ingestor/main.go", "--profile", "test"]
+    description: "Launch Data Ingestor with test profile."
+
+  - action: "wait"
+    duration: 3
+    description: "Allow Ingestor to connect and begin normalization."
+
+  - action: "start_service"
+    service: "orderbook-aggregator"
+    args: ["go", "run", "cmd/orderbook-aggregator/main.go", "--profile", "test"]
+    description: "Launch Orderbook Aggregator to process raw orderbook data."
+
+  - action: "start_service"
+    service: "technical-analysis"
+    args: ["go", "run", "cmd/technical-analysis/main.go", "--profile", "test"]
+    description: "Launch Technical Analysis to store indicators in Postgres."
+
+  - action: "wait"
+    duration: 25
+    description: "Wait for data to flow through the aggregator and persist to database."
+
+  - action: "step"
+    step: "02-Scenarios/go/triple_pipeline_test.go::TestTriplePipeline"
+    description: "Verify the triple integration pipeline."

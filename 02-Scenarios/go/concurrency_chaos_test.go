@@ -44,7 +44,7 @@ func TestConcurrencyAndChaos(t *testing.T) {
 				return
 			}
 
-			_, logger := unilog.Init(clientName, "test", "standard", "INFO", false, nil)
+			_, logger := unilog.Init(clientName, "test", "minimal", "INFO", false, nil)
 			defer logger.Close()
 
 			appConfig.Logger = logger

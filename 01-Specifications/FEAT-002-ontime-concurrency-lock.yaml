@@ -1,0 +1,24 @@
+# Feature: OnTime Scheduler Concurrency Stress Test
+# Spec: [[02-Business-BDD/02-Behavior-Specs/ontime-scheduler/FEAT-002-Concurrency-Lock]]
+# Implementation: 02-Scenarios/go/ontime_concurrency_test.go
+
+name: "OnTime Scheduler Concurrency Lock Validation"
+scenario: "Verify the scheduler handles concurrent job creation and enforces execution locks"
+description: "Fires 50 simultaneous job creation requests and 50 simultaneous execution triggers against a single job with max_instances=1, then verifies that only one execution actually ran."
+version: "1.0.0"
+
+steps:
+  - action: "start_service"
+    service: "ontime-scheduler"
+    args: ["go", "run", "cmd/ontime-scheduler/main.go", "--profile", "standalone"]
+    description: "Launch the OnTime Scheduler service."
+
+  - action: "wait"
+    duration: 3
+    description: "Allow scheduler HTTP API to start accepting connections."
+
+  - step: "02-Scenarios/go/ontime_concurrency_test.go::TestOntimeConcurrentJobCreation"
+    description: "Stress-test concurrent job creation (50 simultaneous requests)."
+
+  - step: "02-Scenarios/go/ontime_concurrency_test.go::TestOntimeConcurrentExecutionLock"
+    description: "Verify the concurrency lock only allows 1 instance despite 50 triggers."

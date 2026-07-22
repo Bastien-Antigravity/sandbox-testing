@@ -31,3 +31,6 @@ steps:
   - action: "wait"
     duration: 10
     description: "Allowing time for full bootstrap and DB connection attempts."
+
+  - step: "02-Scenarios/go/web_interface_bootstrap_test.go::TestWebInterfaceBootstrap"
+    description: "Verify that web-interface responds to HTTP queries and contains localized paths."

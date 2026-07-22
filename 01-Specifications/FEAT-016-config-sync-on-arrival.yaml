@@ -1,0 +1,29 @@
+# Feature: Config Server Sync-on-Arrival
+# Spec: sandbox-testing/01-Specifications/FEAT-016-config-sync-on-arrival.yaml
+# Implementation: 02-Scenarios/go/config_sync_on_arrival_test.go
+
+name: "Config Server Sync-on-Arrival Consistency"
+description: "Verifies that new clients receive the full current state immediately after connecting."
+version: "1.0.0"
+
+steps:
+  - action: "start_service"
+    service: "log-server"
+    args: ["cargo", "run"]
+    description: "Dependencies."
+
+  - action: "wait"
+    duration: 5
+    description: "Ready."
+
+  - action: "start_service"
+    service: "config-server"
+    args: ["./bin/config-server"]
+    description: "Target server."
+
+  - action: "wait"
+    duration: 5
+    description: "Ready."
+
+  - step: "02-Scenarios/go/config_sync_on_arrival_test.go::TestConfigSyncOnArrival"
+    description: "Execute the late-joiner synchronization logic."

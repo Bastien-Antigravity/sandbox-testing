@@ -1,0 +1,19 @@
+# 🧪 Scenario: Ontime Scheduler Hardened Orchestration
+# Spec: [[02-Business-BDD/02-Behavior-Specs/ontime-scheduler/FEAT-008-Scheduler-Migration]]
+
+name: "Scheduler Hardened Orchestration"
+description: "Verify gRPC control, RSA decryption for external API calls, and misfire grace time logic."
+
+steps:
+  - action: "wait"
+    duration: 1
+    description: "Initialize test environment."
+
+  - step: "02-Scenarios/go/scheduler_hardened_test.go::TestGRPCControl"
+    description: "Verify that the gRPC service can list jobs and trigger execution."
+
+  - step: "02-Scenarios/go/scheduler_hardened_test.go::TestRSADecryption"
+    description: "Verify that ENC(...) blocks in URLs/Payloads are decrypted before external API calls."
+
+  - step: "02-Scenarios/go/scheduler_hardened_test.go::TestMisfireGraceTime"
+    description: "Verify that jobs are skipped if they exceed the misfire grace period."

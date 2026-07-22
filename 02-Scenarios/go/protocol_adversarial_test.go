@@ -17,8 +17,13 @@ func TestProtocolHardeningAdversarial(t *testing.T) {
 	t.Run("Timeout_Protection", func(t *testing.T) {
 		fmt.Println(">>> QA Test: Timeout Protection (Slow-Loris)")
 		conn, err := net.Dial("tcp", host+":"+tcpPort)
+		if err == nil {
+			defer conn.Close()
+		}
 		assert.NoError(t, err)
-		defer conn.Close()
+		if err != nil {
+			return
+		}
 
 		// Send NOTHING. Wait for 6 seconds.
 		// The server should close the connection after 5 seconds.
@@ -38,8 +43,13 @@ func TestProtocolHardeningAdversarial(t *testing.T) {
 	t.Run("OOM_Protection", func(t *testing.T) {
 		fmt.Println(">>> QA Test: OOM Protection (Message Too Large)")
 		conn, err := net.Dial("tcp", host+":"+tcpPort)
+		if err == nil {
+			defer conn.Close()
+		}
 		assert.NoError(t, err)
-		defer conn.Close()
+		if err != nil {
+			return
+		}
 
 		// Send a length prefix of 11MB (over the 10MB limit)
 		msgLen := uint32(11 * 1024 * 1024)
@@ -60,8 +70,13 @@ func TestProtocolHardeningAdversarial(t *testing.T) {
 	t.Run("Handshake_Bypass_Protection", func(t *testing.T) {
 		fmt.Println(">>> QA Test: Handshake Bypass Protection")
 		conn, err := net.Dial("tcp", host+":"+tcpPort)
+		if err == nil {
+			defer conn.Close()
+		}
 		assert.NoError(t, err)
-		defer conn.Close()
+		if err != nil {
+			return
+		}
 
 		// Send a length prefix of 10 bytes, but NOT starting with 0,0,0,0 (not a Cap'n Proto unpacked message)
 		// Or send valid data but NOT a handshake.
@@ -78,3 +93,4 @@ func TestProtocolHardeningAdversarial(t *testing.T) {
 		assert.Error(t, err, "Server should have rejected data that skipped the handshake")
 	})
 }
+

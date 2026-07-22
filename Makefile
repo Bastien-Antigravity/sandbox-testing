@@ -31,6 +31,15 @@ test-all:
 test-%:
 	$(ORCHESTRATOR) 01-Specifications/$*.yaml --mode $(MODE)
 
+test-ta:
+	$(ORCHESTRATOR) 01-Specifications/FEAT-011-Technical-Analysis.yaml --mode $(MODE)
+
+test-ob:
+	$(ORCHESTRATOR) 01-Specifications/FEAT-012-Orderbook-Aggregator.yaml --mode $(MODE)
+
+test-real:
+	$(ORCHESTRATOR) 01-Specifications/FEAT-013-Full-Pipeline-Real.yaml --mode $(MODE)
+
 clean:
 	@echo "Cleaning up sandbox environment..."
 	docker-compose -f 00-Environment/config/docker-compose.yaml down 2>/dev/null || true

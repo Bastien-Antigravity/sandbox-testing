@@ -1,0 +1,41 @@
+name: "Full Data Pipeline End-to-End Real Tests"
+scenario: "Verify data flow from Mock WS -> Ingestor -> Market-Observer -> TA"
+description: "This scenario validates the entire pipeline with Postgres storage and multiple symbols."
+version: "1.0.0"
+
+steps:
+  - action: "start_service"
+    service: "sandbox-testing/04-Mock-Provider"
+    args: ["go", "run", "main.go", "--mode", "ws", "--port", "8080", "--symbol", "BTCUSDT,ETHUSDT"]
+    description: "Launch the Mock Binance WebSocket server for BTC & ETH."
+
+  - action: "wait"
+    duration: 2
+    description: "Allow mock server to start."
+
+  - action: "start_service"
+    service: "data-ingestor"
+    args: ["go", "run", "cmd/data-ingestor/main.go", "--profile", "test"]
+    description: "Launch Data Ingestor with test profile."
+
+  - action: "wait"
+    duration: 5
+    description: "Allow Ingestor to connect and start publishing."
+
+  - action: "start_service"
+    service: "technical-analysis"
+    args: ["go", "run", "cmd/technical-analysis/main.go", "--profile", "test"]
+    description: "Launch Technical Analysis to store indicators in Postgres."
+
+  - action: "start_service"
+    service: "web-interface"
+    args: ["go", "run", "cmd/web-interface/main.go", "--profile", "test"]
+    description: "Launch Web Interface to visualize results."
+
+  - action: "wait"
+    duration: 30
+    description: "Wait for data to flow through the entire pipeline and persist to Postgres."
+
+  - action: "step"
+    step: "02-Scenarios/go/full_pipeline_test.go::TestFullPipeline"
+    description: "Verify the end-to-end results in Postgres."

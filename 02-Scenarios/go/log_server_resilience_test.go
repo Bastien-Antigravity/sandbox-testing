@@ -1,12 +1,9 @@
 package scenarios
 
 import (
-	"context"
 	"encoding/binary"
 	"fmt"
 	"net"
-	"os/exec"
-	"strings"
 	"testing"
 	"time"
 
@@ -25,8 +22,13 @@ func TestLogServerHardeningScenario(t *testing.T) {
 	t.Run("Handshake_Identity_Verification", func(t *testing.T) {
 		fmt.Println(">>> Phase 1: Verifying Handshake Identity Extraction")
 		conn, err := net.Dial("tcp", host+":"+tcpPort)
+		if err == nil {
+			defer conn.Close()
+		}
 		assert.NoError(t, err)
-		defer conn.Close()
+		if err != nil {
+			return
+		}
 
 		// Build HelloMsg (Unpacked Cap'n Proto)
 		msg, seg, err := capnp.NewMessage(capnp.SingleSegment(nil))
@@ -59,8 +61,13 @@ func TestLogServerHardeningScenario(t *testing.T) {
 	t.Run("Zombie_Pruning_60s_Timeout", func(t *testing.T) {
 		fmt.Println(">>> Phase 2: Verifying 60s Zombie Pruning Timeout (this will take ~65 seconds)")
 		conn, err := net.Dial("tcp", host+":"+tcpPort)
+		if err == nil {
+			defer conn.Close()
+		}
 		assert.NoError(t, err)
-		defer conn.Close()
+		if err != nil {
+			return
+		}
 
 		// Perform handshake to avoid 5s handshake timeout
 		msg, seg, _ := capnp.NewMessage(capnp.SingleSegment(nil))
@@ -93,8 +100,13 @@ func TestLogServerHardeningScenario(t *testing.T) {
 	t.Run("Handshake_Timeout_5s", func(t *testing.T) {
 		fmt.Println(">>> Phase 3: Verifying 5s Handshake Timeout (Slow-Loris protection)")
 		conn, err := net.Dial("tcp", host+":"+tcpPort)
+		if err == nil {
+			defer conn.Close()
+		}
 		assert.NoError(t, err)
-		defer conn.Close()
+		if err != nil {
+			return
+		}
 
 		// Send NOTHING. Wait for 7 seconds.
 		time.Sleep(7 * time.Second)
@@ -109,11 +121,4 @@ func TestLogServerHardeningScenario(t *testing.T) {
 		_, err = conn.Read(one)
 		assert.Error(t, err, "Server should have closed the connection due to handshake timeout")
 	})
-}
-
-// Helper to fetch last N lines of docker logs
-func getDockerLogs(containerName string, lines int) string {
-	cmd := exec.Command("docker", "logs", "--tail", fmt.Sprintf("%d", lines), containerName)
-	out, _ := cmd.CombinedOutput()
-	return string(out)
 }

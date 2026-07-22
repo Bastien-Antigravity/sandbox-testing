@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net"
-	"os/exec"
 	"testing"
 	"time"
 
@@ -25,8 +24,13 @@ func TestConfigServerHardeningScenario(t *testing.T) {
 	t.Run("Stable_Identity_Verification", func(t *testing.T) {
 		fmt.Println(">>> Phase 1: Verifying Stable Identity (Port Stripping)")
 		conn, err := net.Dial("tcp", host+":"+tcpPort)
+		if err == nil {
+			defer conn.Close()
+		}
 		assert.NoError(t, err)
-		defer conn.Close()
+		if err != nil {
+			return
+		}
 
 		// 1. Send Handshake
 		msg, seg, _ := capnp.NewMessage(capnp.SingleSegment(nil))
@@ -55,13 +59,25 @@ func TestConfigServerHardeningScenario(t *testing.T) {
 		fmt.Println(">>> Phase 2: Verifying Mailbox Backpressure (Tight Buffer of 3)")
 		
 		// Client A: Active reader
-		connA, _ := net.Dial("tcp", host+":"+tcpPort)
-		defer connA.Close()
+		connA, errA := net.Dial("tcp", host+":"+tcpPort)
+		if errA == nil {
+			defer connA.Close()
+		}
+		assert.NoError(t, errA)
+		if errA != nil {
+			return
+		}
 		doHandshake(connA, "READER_A")
 
 		// Client B: Slow reader (stops reading)
-		connB, _ := net.Dial("tcp", host+":"+tcpPort)
-		defer connB.Close()
+		connB, errB := net.Dial("tcp", host+":"+tcpPort)
+		if errB == nil {
+			defer connB.Close()
+		}
+		assert.NoError(t, errB)
+		if errB != nil {
+			return
+		}
 		doHandshake(connB, "SLOW_READER_B")
 
 		time.Sleep(1 * time.Second)
@@ -99,8 +115,13 @@ func TestConfigServerHardeningScenario(t *testing.T) {
 	t.Run("Async_Debounced_Persistence", func(t *testing.T) {
 		fmt.Println(">>> Phase 3: Verifying Async Debounced Persistence (5s)")
 		conn, err := net.Dial("tcp", host+":"+tcpPort)
+		if err == nil {
+			defer conn.Close()
+		}
 		assert.NoError(t, err)
-		defer conn.Close()
+		if err != nil {
+			return
+		}
 		doHandshake(conn, "PERSISTENCE_TESTER")
 
 		// 1. Send update
@@ -129,17 +150,4 @@ func TestConfigServerHardeningScenario(t *testing.T) {
 		logs := getDockerLogs("sandbox-config-server", 50)
 		assert.Contains(t, logs, "Background persistence: Saving dirty state...", "Worker should have triggered after 5s")
 	})
-}
-
-// Internal helper for handshake
-func doHandshake(conn net.Conn, name string) {
-	msg, seg, _ := capnp.NewMessage(capnp.SingleSegment(nil))
-	hello, _ := schemas.NewRootHelloMsg(seg)
-	hello.SetFromName(name)
-	hello.SetFromHost("LOAD_GEN")
-	bytes, _ := msg.Marshal()
-	lenBuf := make([]byte, 4)
-	binary.BigEndian.PutUint32(lenBuf, uint32(len(bytes)))
-	_, _ = conn.Write(lenBuf)
-	_, _ = conn.Write(bytes)
 }

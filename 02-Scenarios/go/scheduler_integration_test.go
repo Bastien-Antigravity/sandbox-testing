@@ -30,7 +30,7 @@ func TestSchedulerFullLifecycle(t *testing.T) {
 	db.AutoMigrate(&models.Job{}, &models.JobLog{})
 
 	// 2. Setup Engine & Server
-	engine := scheduler.NewEngine(db, nil)
+	engine := scheduler.NewEngine(db, nil, nil)
 	engine.Start()
 	defer engine.Stop()
 

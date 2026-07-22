@@ -8,8 +8,8 @@ import (
 	"time"
 
 	"capnproto.org/go/capnp/v3"
-	"github.com/Bastien-Antigravity/flexible-logger/src/schemas/capnp/logger"
-	"github.com/Bastien-Antigravity/safe-socket/src/schemas"
+	logger_schemas "github.com/Bastien-Antigravity/flexible-logger/src/schemas/capnp/logger"
+	socket_schemas "github.com/Bastien-Antigravity/safe-socket/src/schemas"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -23,12 +23,17 @@ func TestLogServerPerformanceScenario(t *testing.T) {
 		fmt.Println(">>> Verifying High-Volume Ingestion (Async Console Worker)")
 		
 		conn, err := net.Dial("tcp", host+":"+tcpPort)
+		if err == nil {
+			defer conn.Close()
+		}
 		assert.NoError(t, err)
-		defer conn.Close()
+		if err != nil {
+			return
+		}
 
 		// 1. Mandatory Handshake
 		msg, seg, _ := capnp.NewMessage(capnp.SingleSegment(nil))
-		hello, _ := schemas.NewRootHelloMsg(seg)
+		hello, _ := socket_schemas.NewRootHelloMsg(seg)
 		hello.SetFromName("PERF_STRESS_TESTER")
 		hello.SetFromHost("LOAD_GENERATOR")
 		bytes, _ := msg.Marshal()
@@ -46,10 +51,10 @@ func TestLogServerPerformanceScenario(t *testing.T) {
 		
 		for i := 0; i < count; i++ {
 			lMsg, lSeg, _ := capnp.NewMessage(capnp.SingleSegment(nil))
-			log, _ := logger.NewRootLoggerMsg(lSeg)
-			log.SetMessage(fmt.Sprintf("STRESS_TEST_MESSAGE_%d", i))
+			log, _ := logger_schemas.NewRootLoggerMsg(lSeg)
+			log.SetMessage_(fmt.Sprintf("STRESS_TEST_MESSAGE_%d", i))
 			log.SetLoggerName("perf-tester")
-			log.SetLevel(logger.Level_info)
+			log.SetLevel(logger_schemas.Level_info)
 			log.SetTimestamp(time.Now().Format(time.RFC3339Nano))
 			
 			lBytes, _ := lMsg.MarshalPacked() // packed as required by log-server

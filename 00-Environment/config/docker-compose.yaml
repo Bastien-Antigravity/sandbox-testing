@@ -54,17 +54,18 @@ services:
         aliases:
           - log-server
     ports:
-      - "15000:15000"
-      - "15001:15001"
+      - "9020:9020"
+      - "9021:9021"
     healthcheck:
-      test: [ "CMD-SHELL", "nc -z localhost 15000 || exit 1" ]
+      test: [ "CMD-SHELL", "nc -z 127.0.0.1 9020 || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
   config-server:
     build:
-      context: ../../../config-server
+      context: ../../../
+      dockerfile: config-server/Dockerfile
     container_name: sandbox-config-server
     restart: unless-stopped
     depends_on:
@@ -80,14 +81,15 @@ services:
     ports:
       - "3306:3306"
     healthcheck:
-      test: [ "CMD-SHELL", "nc -z localhost 3306 || exit 1" ]
+      test: [ "CMD-SHELL", "nc -z 127.0.0.1 3306 || exit 1" ]
       interval: 10s
       timeout: 5s
       retries: 5
 
   notif-server:
     build:
-      context: ../../../notif-server
+      context: ../../../
+      dockerfile: notif-server/Dockerfile
     container_name: sandbox-notif-server
     restart: unless-stopped
     depends_on:
@@ -107,7 +109,8 @@ services:
 
   tele-remote:
     build:
-      context: ../../../tele-remote
+      context: ../../../
+      dockerfile: tele-remote/Dockerfile
     container_name: sandbox-tele-remote
     restart: unless-stopped
     depends_on:

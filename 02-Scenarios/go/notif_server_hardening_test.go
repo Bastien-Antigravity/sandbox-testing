@@ -9,9 +9,7 @@ import (
 	"testing"
 	"time"
 
-	"capnproto.org/go/capnp/v3"
 	"github.com/Bastien-Antigravity/notif-server/src/core"
-	"github.com/Bastien-Antigravity/safe-socket/src/schemas"
 	"github.com/Bastien-Antigravity/universal-logger/src/utils"
 	"github.com/stretchr/testify/assert"
 )
@@ -81,18 +79,6 @@ t.Run("Worker_Pool_Non_Blocking", func(t *testing.T) {
 })
 }
 
-
-func doHandshake(conn net.Conn, name string) {
-	msg, seg, _ := capnp.NewMessage(capnp.SingleSegment(nil))
-	hello, _ := schemas.NewRootHelloMsg(seg)
-	hello.SetFromName(name)
-	hello.SetFromHost("TEST_NODE")
-	bytes, _ := msg.Marshal()
-	lenBuf := make([]byte, 4)
-	binary.BigEndian.PutUint32(lenBuf, uint32(len(bytes)))
-	_, _ = conn.Write(lenBuf)
-	_, _ = conn.Write(bytes)
-}
 
 func getDockerPort(containerName, internalPort string) string {
 	cmd := exec.Command("docker", "port", containerName, internalPort)
