@@ -6,21 +6,21 @@ import (
 	"testing"
 	"time"
 
-	_ "modernc.org/sqlite"
 	"github.com/stretchr/testify/assert"
+	_ "modernc.org/sqlite"
 )
 
 func TestTechnicalAnalysis(t *testing.T) {
 	t.Run("Indicator_Calculation_Verification", func(t *testing.T) {
 		fmt.Println(">>> Scenario Test: Verifying Technical Analysis Indicators")
-		
+
 		// Path to the SQLite database created by the technical-analysis service
 		// The orchestrator runs the service in its own directory
 		dbPath := "../../../technical-analysis/technical-analysis.db"
-		
+
 		var db *sql.DB
 		var err error
-		
+
 		// Retry connecting to DB as it might take a moment to be created
 		for i := 0; i < 10; i++ {
 			db, err = sql.Open("sqlite", dbPath)
@@ -49,7 +49,7 @@ func TestTechnicalAnalysis(t *testing.T) {
 		// We use a dynamic query because indicator names might vary
 		rows, err := db.Query("SELECT name FROM sqlite_master WHERE type='table' AND name LIKE 'BTCUSDT_%'")
 		assert.NoError(t, err)
-		
+
 		foundIndicator := false
 		for rows.Next() {
 			var tableName string
@@ -57,14 +57,14 @@ func TestTechnicalAnalysis(t *testing.T) {
 			if tableName != "BTCUSDT_ohlcv" {
 				fmt.Printf(">>> Found indicator table: %s\n", tableName)
 				foundIndicator = true
-				
+
 				err = db.QueryRow(fmt.Sprintf("SELECT COUNT(*) FROM %s", tableName)).Scan(&smaCount)
 				assert.NoError(t, err)
 				fmt.Printf(">>> Found %d entries in %s\n", smaCount, tableName)
 			}
 		}
 		rows.Close()
-		
+
 		assert.True(t, foundIndicator, "No indicator tables found (other than OHLCV)")
 	})
 }

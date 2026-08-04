@@ -11,9 +11,9 @@ import (
 
 // OrderbookEvent represents the internal model we expect the data-ingestor to produce.
 type OrderbookEvent struct {
-	Symbol            string   `json:"symbol"`
-	ExchangeTimestamp int64    `json:"exchange_ts"`
-	LocalTimestamp    int64    `json:"local_ts"`
+	Symbol            string     `json:"symbol"`
+	ExchangeTimestamp int64      `json:"exchange_ts"`
+	LocalTimestamp    int64      `json:"local_ts"`
 	Bids              [][]string `json:"bids"`
 	Asks              [][]string `json:"asks"`
 }
@@ -21,7 +21,7 @@ type OrderbookEvent struct {
 func TestOrderbookIngestion(t *testing.T) {
 	t.Run("Normalization_Accuracy_and_Latency", func(t *testing.T) {
 		fmt.Println(">>> QA Test: Normalization Accuracy and Latency")
-		
+
 		rawBinanceJSON := `{
 			"e": "depthUpdate",
 			"E": 1623456789123,
@@ -34,7 +34,7 @@ func TestOrderbookIngestion(t *testing.T) {
 
 		// Simulate the ingestor's logic
 		start := time.Now()
-		
+
 		var raw map[string]interface{}
 		err := json.Unmarshal([]byte(rawBinanceJSON), &raw)
 		assert.NoError(t, err)
@@ -70,15 +70,15 @@ func TestOrderbookIngestion(t *testing.T) {
 
 	t.Run("Heartbeat_Enforcement", func(t *testing.T) {
 		fmt.Println(">>> QA Test: Heartbeat Enforcement (Watchdog)")
-		
+
 		// The service should have a 30s timeout.
 		// For the test, we assume we can configure this timeout to be smaller for verification.
 		heartbeatTimeout := 100 * time.Millisecond
 		lastDataTime := time.Now()
-		
+
 		// Wait for more than the timeout
 		time.Sleep(150 * time.Millisecond)
-		
+
 		if time.Since(lastDataTime) > heartbeatTimeout {
 			fmt.Println(">>> Watchdog triggered: Connection stale")
 			// In real implementation, this should trigger a reconnect
@@ -89,18 +89,18 @@ func TestOrderbookIngestion(t *testing.T) {
 
 	t.Run("Discard_Empty_Updates", func(t *testing.T) {
 		fmt.Println(">>> QA Test: Discard Empty Updates")
-		
+
 		emptyUpdateJSON := `{
 			"e": "depthUpdate", "E": 1623456789124, "s": "BTCUSDT",
 			"b": [], "a": []
 		}`
-		
+
 		var raw map[string]interface{}
 		json.Unmarshal([]byte(emptyUpdateJSON), &raw)
-		
+
 		bids := raw["b"].([]interface{})
 		asks := raw["a"].([]interface{})
-		
+
 		isValid := len(bids) > 0 || len(asks) > 0
 		assert.False(t, isValid, "Ingestor must discard events with empty bids and asks")
 	})

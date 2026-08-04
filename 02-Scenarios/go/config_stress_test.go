@@ -28,7 +28,7 @@ func TestConfigConcurrentStress(t *testing.T) {
 	for i := 0; i < numClients; i++ {
 		go func(id int) {
 			defer wg.Done()
-			
+
 			conn, err := net.Dial("tcp", host+":"+port)
 			if err != nil {
 				t.Errorf("Client %d failed to connect: %v", id, err)
@@ -48,7 +48,7 @@ func TestConfigConcurrentStress(t *testing.T) {
 				Payload: payload,
 			}
 			mBytes, _ := proto.Marshal(msg)
-			
+
 			lenBuf := make([]byte, 4)
 			binary.BigEndian.PutUint32(lenBuf, uint32(len(mBytes)))
 			_, _ = conn.Write(lenBuf)
@@ -80,8 +80,10 @@ func TestConfigConcurrentStress(t *testing.T) {
 		Command: config_schema.ConfigMsg_GET_SYNC,
 	}
 	gBytes, _ := proto.Marshal(getMsg)
-	if len(gBytes) == 0 { gBytes = []byte{0x78, 0x01} } // Protopitfall fix
-	
+	if len(gBytes) == 0 {
+		gBytes = []byte{0x78, 0x01}
+	} // Protopitfall fix
+
 	lenBuf := make([]byte, 4)
 	binary.BigEndian.PutUint32(lenBuf, uint32(len(gBytes)))
 	_, _ = conn.Write(lenBuf)
@@ -91,6 +93,6 @@ func TestConfigConcurrentStress(t *testing.T) {
 	respLenBuf := make([]byte, 4)
 	_, err = io.ReadFull(conn, respLenBuf)
 	assert.NoError(t, err, "Server should respond after stress")
-	
+
 	fmt.Println(">>> SUCCESS: Server survived high concurrency collision.")
 }

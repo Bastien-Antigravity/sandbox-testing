@@ -73,9 +73,9 @@ func TestConfigSyncOnArrival(t *testing.T) {
 	// safe-socket treats 0-length as heartbeat.
 	// FIX: Manually append an unknown field [tag=15, wiretype=0 (varint), value=1]
 	if len(gBytes) == 0 {
-		gBytes = []byte{0x78, 0x01} 
+		gBytes = []byte{0x78, 0x01}
 	}
-	
+
 	binary.BigEndian.PutUint32(lenBuf, uint32(len(gBytes)))
 	_, _ = connB.Write(lenBuf)
 	_, _ = connB.Write(gBytes)
@@ -93,8 +93,10 @@ func TestConfigSyncOnArrival(t *testing.T) {
 		}
 		respLen := binary.BigEndian.Uint32(respLenBuf2)
 		fmt.Printf(">>> Received message with length: %d\n", respLen)
-		
-		if respLen == 0 { continue } // Heartbeat
+
+		if respLen == 0 {
+			continue
+		} // Heartbeat
 
 		respData := make([]byte, respLen)
 		_, err = io.ReadFull(connB, respData)
@@ -102,7 +104,9 @@ func TestConfigSyncOnArrival(t *testing.T) {
 
 		respMsg := &config_schema.ConfigMsg{}
 		err = proto.Unmarshal(respData, respMsg)
-		if err != nil { continue }
+		if err != nil {
+			continue
+		}
 
 		if respMsg.Command == config_schema.ConfigMsg_GET_SYNC {
 			err = json.Unmarshal(respMsg.Payload, &recoveredConfig)

@@ -9,8 +9,8 @@ import (
 	"time"
 
 	"capnproto.org/go/capnp/v3"
-	"github.com/Bastien-Antigravity/safe-socket/src/schemas"
 	config_schema "github.com/Bastien-Antigravity/distributed-config/src/schemas"
+	"github.com/Bastien-Antigravity/safe-socket/src/schemas"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
 )
@@ -38,7 +38,7 @@ func TestConfigServerHardeningScenario(t *testing.T) {
 		hello.SetFromName("STABLE_IDENTITY_TEST")
 		hello.SetFromHost("TEST_HOST")
 		bytes, _ := msg.Marshal()
-		
+
 		lenBuf := make([]byte, 4)
 		binary.BigEndian.PutUint32(lenBuf, uint32(len(bytes)))
 		_, _ = conn.Write(lenBuf)
@@ -50,14 +50,14 @@ func TestConfigServerHardeningScenario(t *testing.T) {
 		// without a dynamic port number.
 		logs := getDockerLogs("sandbox-config-server", 20)
 		assert.Contains(t, logs, "Client identified: STABLE_IDENTITY_TEST-", "Identified name should start correctly")
-		
+
 		// The regex check for no port would be better, but simple string check is a good start.
 		// We expect "TEST_HOST-127.0.0.1" and NOT something like "TEST_HOST-127.0.0.1:54321"
 	})
 
 	t.Run("Mailbox_Backpressure_Overflow", func(t *testing.T) {
 		fmt.Println(">>> Phase 2: Verifying Mailbox Backpressure (Tight Buffer of 3)")
-		
+
 		// Client A: Active reader
 		connA, errA := net.Dial("tcp", host+":"+tcpPort)
 		if errA == nil {
@@ -94,12 +94,12 @@ func TestConfigServerHardeningScenario(t *testing.T) {
 				Payload: payload,
 			}
 			mBytes, _ := proto.Marshal(msg)
-			
+
 			lenBuf := make([]byte, 4)
 			binary.BigEndian.PutUint32(lenBuf, uint32(len(mBytes)))
 			_, _ = connA.Write(lenBuf)
 			_, _ = connA.Write(mBytes)
-			
+
 			// Small sleep to ensure sequential processing
 			time.Sleep(100 * time.Millisecond)
 		}
@@ -129,7 +129,7 @@ func TestConfigServerHardeningScenario(t *testing.T) {
 		payload, _ := json.Marshal(update)
 		msg := &config_schema.ConfigMsg{Command: config_schema.ConfigMsg_PUT_SYNC, Payload: payload}
 		mBytes, _ := proto.Marshal(msg)
-		
+
 		start := time.Now()
 		lenBuf := make([]byte, 4)
 		binary.BigEndian.PutUint32(lenBuf, uint32(len(mBytes)))

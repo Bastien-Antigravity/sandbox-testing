@@ -38,7 +38,7 @@ func TestConfigServerResilience(t *testing.T) {
 
 	logs := out.String()
 	fmt.Printf(">>> Notif-Server Logs during outage:\n%s\n", logs)
-	// We don't assert specific strings yet as we want to observe first, 
+	// We don't assert specific strings yet as we want to observe first,
 	// but we expect to see some network-related errors.
 
 	// 4. Scenario: Restart the Config Server
@@ -56,7 +56,7 @@ func TestConfigServerResilience(t *testing.T) {
 	out.Reset()
 	logCmd.Stdout = &out
 	_ = logCmd.Run()
-	
+
 	srvLogs := out.String()
 	fmt.Printf(">>> Config-Server Logs after recovery:\n%s\n", srvLogs)
 

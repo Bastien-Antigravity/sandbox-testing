@@ -35,7 +35,7 @@ func TestSafeSocketIdentityHandshake(t *testing.T) {
 	// 4. Assert that the log-server identified a client via handshake
 	// The hybrid listener logs: "client identified via handshake as '...'"
 	assert.Contains(t, srvLogs, "client identified via handshake as", "Log server should have identified a client via handshake")
-	
+
 	// Specifically check for notif-server (which we just updated with new dependencies)
 	assert.Contains(t, srvLogs, "notif-server@", "Log server should have identified the notif-server")
 

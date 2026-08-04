@@ -121,7 +121,7 @@ func startWebSocketServer(port int, symbols []string) {
 			select {
 			case <-ticker.C:
 				counter++
-				
+
 				for _, sym := range symbols {
 					price := fmt.Sprintf("%.2f", basePrice+float64(counter%100)*0.1)
 

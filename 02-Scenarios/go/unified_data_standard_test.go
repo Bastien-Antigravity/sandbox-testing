@@ -13,7 +13,7 @@ func TestUnifiedDataStandard(t *testing.T) {
 
 	t.Run("MarketEvent_L1_Integration", func(t *testing.T) {
 		fmt.Println(">>> Step 1: MarketEvent (Trade) Serialization/Deserialization")
-		
+
 		trade := business.Trade{
 			Price:     45000.75,
 			Size:      0.05,
@@ -46,7 +46,7 @@ func TestUnifiedDataStandard(t *testing.T) {
 
 	t.Run("OHLCV_Bar_Integrity", func(t *testing.T) {
 		fmt.Println(">>> Step 2: OHLCV Bar Integrity")
-		
+
 		bar := business.OHLCV{
 			Symbol:   "ETH/USDT",
 			Interval: "5m",
@@ -72,7 +72,7 @@ func TestUnifiedDataStandard(t *testing.T) {
 
 	t.Run("Strategy_Signal_Precision", func(t *testing.T) {
 		fmt.Println(">>> Step 3: Strategy Signal Precision")
-		
+
 		signal := business.Signal{
 			Source:   "alpha-v1",
 			Symbol:   "SOL/USDT",

@@ -31,7 +31,7 @@ func TestProtocolHardeningAdversarial(t *testing.T) {
 		buf := make([]byte, 1)
 		_ = conn.SetReadDeadline(time.Now().Add(7 * time.Second))
 		n, err := conn.Read(buf)
-		
+
 		duration := time.Since(start)
 		fmt.Printf(">>> Connection closed after %v (Read: %d, Error: %v)\n", duration, n, err)
 
@@ -55,7 +55,7 @@ func TestProtocolHardeningAdversarial(t *testing.T) {
 		msgLen := uint32(11 * 1024 * 1024)
 		lenBuf := make([]byte, 4)
 		binary.BigEndian.PutUint32(lenBuf, msgLen)
-		
+
 		_, err = conn.Write(lenBuf)
 		assert.NoError(t, err)
 
@@ -63,7 +63,7 @@ func TestProtocolHardeningAdversarial(t *testing.T) {
 		_ = conn.SetReadDeadline(time.Now().Add(2 * time.Second))
 		buf := make([]byte, 1)
 		_, err = conn.Read(buf)
-		
+
 		assert.Error(t, err, "Server should have rejected the 11MB prefix and closed the connection")
 	})
 
@@ -93,4 +93,3 @@ func TestProtocolHardeningAdversarial(t *testing.T) {
 		assert.Error(t, err, "Server should have rejected data that skipped the handshake")
 	})
 }
-

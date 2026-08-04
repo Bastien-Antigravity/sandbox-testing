@@ -40,7 +40,7 @@ func TestConfigServerAdversarialHardening(t *testing.T) {
 		// The server should close the connection because 2GB > MaxPayloadSize
 		// Wait a bit for server to process
 		time.Sleep(1 * time.Second)
-		
+
 		// Attempt to read - should fail or be EOF
 		_ = conn.SetReadDeadline(time.Now().Add(1 * time.Second))
 		buf := make([]byte, 1)
@@ -71,7 +71,7 @@ func TestConfigServerAdversarialHardening(t *testing.T) {
 
 		// Server should log error and close connection (or continue if it handles per-message errors)
 		time.Sleep(1 * time.Second)
-		
+
 		// In config-server, ProcessRequest failure returns error which causes handleConnection to return, closing socket.
 		_ = conn.SetReadDeadline(time.Now().Add(2 * time.Second))
 		buf := make([]byte, 4)
@@ -94,14 +94,14 @@ func TestConfigServerAdversarialHardening(t *testing.T) {
 		// Construct massive handshake
 		msg, seg, _ := capnp.NewMessage(capnp.SingleSegment(nil))
 		hello, _ := schemas.NewRootHelloMsg(seg)
-		
+
 		hugeName := make([]byte, 1*1024*1024)
 		for i := range hugeName {
 			hugeName[i] = 'A'
 		}
 		hello.SetFromName(string(hugeName))
 		hello.SetFromHost("LOAD_GEN")
-		
+
 		bytes, _ := msg.Marshal()
 		lenBuf := make([]byte, 4)
 		binary.BigEndian.PutUint32(lenBuf, uint32(len(bytes)))
@@ -109,7 +109,7 @@ func TestConfigServerAdversarialHardening(t *testing.T) {
 		_, _ = conn.Write(bytes)
 
 		time.Sleep(1 * time.Second)
-		
+
 		// The server should either reject it or handle it without crashing.
 		// If it accepts it, it should still be alive.
 		_ = conn.SetReadDeadline(time.Now().Add(1 * time.Second))

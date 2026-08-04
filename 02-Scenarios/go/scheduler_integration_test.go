@@ -44,11 +44,11 @@ def integration_task():
     print("HELLO_FROM_SANDBOX")
 `
 	payload := map[string]interface{}{
-		"name": "Sandbox Integration Job",
-		"func": "test_module:integration_task",
-		"trigger": "cron",
-		"cron": "* * * * *",
-		"script": scriptContent,
+		"name":          "Sandbox Integration Job",
+		"func":          "test_module:integration_task",
+		"trigger":       "cron",
+		"cron":          "* * * * *",
+		"script":        scriptContent,
 		"max_instances": 1,
 	}
 	jsonPayload, _ := json.Marshal(payload)

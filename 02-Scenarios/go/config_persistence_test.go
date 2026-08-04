@@ -22,7 +22,7 @@ func TestConfigServerPersistenceRecovery(t *testing.T) {
 	storePath := "config_persistence_test.json"
 
 	fmt.Println(">>> Starting Config Server Persistence Recovery Scenario")
-	
+
 	// 0. Clean start
 	_ = exec.Command("pkill", "-9", "-x", "config-server").Run()
 	_ = os.Remove(storePath)
@@ -37,7 +37,7 @@ func TestConfigServerPersistenceRecovery(t *testing.T) {
 
 	// 1. Connect and Push Data
 	fmt.Println(">>> Phase 1: Pushing data to Config Server...")
-	
+
 	var conn net.Conn
 	var err error
 	for i := 0; i < 15; i++ {
@@ -51,7 +51,7 @@ func TestConfigServerPersistenceRecovery(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to connect to config-server: %v", err)
 	}
-	
+
 	doHandshake(conn, "PERSISTENCE_WRITER")
 
 	testSection := "persistence_test"
@@ -67,7 +67,7 @@ func TestConfigServerPersistenceRecovery(t *testing.T) {
 		Payload: payload,
 	}
 	mBytes, _ := proto.Marshal(msg)
-	
+
 	lenBuf := make([]byte, 4)
 	binary.BigEndian.PutUint32(lenBuf, uint32(len(mBytes)))
 	_, _ = conn.Write(lenBuf)
@@ -86,7 +86,7 @@ func TestConfigServerPersistenceRecovery(t *testing.T) {
 
 	// 3. Restart the Server (Cold Boot)
 	fmt.Println(">>> Phase 2: Restarting config-server (Cold Boot)...")
-	
+
 	// Aggressive Kill
 	_ = exec.Command("pkill", "-9", "-x", "config-server").Run()
 	time.Sleep(3 * time.Second)
@@ -138,7 +138,7 @@ func TestConfigServerPersistenceRecovery(t *testing.T) {
 	if len(gBytes) == 0 {
 		gBytes = []byte{0x78, 0x01}
 	}
-	
+
 	binary.BigEndian.PutUint32(lenBuf, uint32(len(gBytes)))
 	_, _ = conn2.Write(lenBuf)
 	_, _ = conn2.Write(gBytes)
@@ -160,7 +160,7 @@ func TestConfigServerPersistenceRecovery(t *testing.T) {
 		}
 		respLen := binary.BigEndian.Uint32(respLenBuf2)
 		fmt.Printf(">>> Received message with length: %d\n", respLen)
-		
+
 		if respLen == 0 {
 			fmt.Println(">>> Received HEARTBEAT (length 0)")
 			continue

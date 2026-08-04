@@ -28,7 +28,7 @@ func TestFullPipeline(t *testing.T) {
 
 	t.Run("Technical_Analysis_Indicators", func(t *testing.T) {
 		fmt.Println(">>> Verifying Technical Indicators in Technical-Analysis Schema")
-		
+
 		// Technical Analysis usually uses its service name as schema, often 'public' or 'technical_analysis'
 		// We'll search for the 'btcusdt_ohlcv' table
 		var schemaName string

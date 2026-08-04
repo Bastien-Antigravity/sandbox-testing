@@ -44,7 +44,7 @@ func TestRAGEngineStorage(t *testing.T) {
 		cmd := exec.Command(".venv/bin/python3", "main.py", "index", "--file", "/Users/imac/Desktop/Bastien-Antigravity/obsidian-brain/09-RAG-Engine/src/core/server.py")
 		cmd.Dir = "/Users/imac/Desktop/Bastien-Antigravity/obsidian-brain/09-RAG-Engine"
 		cmd.Env = append(os.Environ(), "RG_DEVEL=false")
-		
+
 		output, err := cmd.CombinedOutput()
 		if err != nil {
 			t.Fatalf("Indexer execution failed: %v\nOutput: %s", err, string(output))

@@ -36,7 +36,7 @@ func TestConcurrencyAndChaos(t *testing.T) {
 		go func(id int) {
 			defer wg.Done()
 			clientName := fmt.Sprintf("mock-client-%d", id)
-			
+
 			// Each client has its own configuration and logger (bootstrapped toolbox pattern)
 			appConfig, err := toolbox_config.LoadConfig("test", nil)
 			if err != nil {
@@ -88,9 +88,9 @@ func TestConcurrencyAndChaos(t *testing.T) {
 				target := targets[rand.Intn(len(targets))]
 				fmt.Printf(">>> CHAOS: Stopping %s...\n", target)
 				_ = exec.Command("docker", "stop", target).Run()
-				
+
 				time.Sleep(3 * time.Second)
-				
+
 				fmt.Printf(">>> CHAOS: Starting %s...\n", target)
 				_ = exec.Command("docker", "start", target).Run()
 			}

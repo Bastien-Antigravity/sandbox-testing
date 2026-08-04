@@ -18,7 +18,7 @@ func TestLogServerHardeningScenario(t *testing.T) {
 
 	// 1. Setup: Ensure log-server is reachable
 	fmt.Println(">>> Starting Log Server Hardening Verification Scenario")
-	
+
 	t.Run("Handshake_Identity_Verification", func(t *testing.T) {
 		fmt.Println(">>> Phase 1: Verifying Handshake Identity Extraction")
 		conn, err := net.Dial("tcp", host+":"+tcpPort)
@@ -35,7 +35,7 @@ func TestLogServerHardeningScenario(t *testing.T) {
 		assert.NoError(t, err)
 		hello, err := schemas.NewRootHelloMsg(seg)
 		assert.NoError(t, err)
-		
+
 		hello.SetFromName("HARDENING_TEST_SERVICE")
 		hello.SetFromHost("TEST_CONTAINER")
 
@@ -54,7 +54,7 @@ func TestLogServerHardeningScenario(t *testing.T) {
 
 		// Verify identity in Docker logs
 		logs := getDockerLogs("sandbox-log-server", 20)
-		assert.Contains(t, logs, "client identified via handshake as 'HARDENING_TEST_SERVICE@TEST_CONTAINER'", 
+		assert.Contains(t, logs, "client identified via handshake as 'HARDENING_TEST_SERVICE@TEST_CONTAINER'",
 			"Server should correctly identify the test service")
 	})
 
@@ -81,15 +81,15 @@ func TestLogServerHardeningScenario(t *testing.T) {
 		_, _ = conn.Write(bytes)
 
 		fmt.Println(">>> Handshake sent. Now remaining idle for 65 seconds...")
-		
+
 		// Wait for more than 60 seconds
 		time.Sleep(65 * time.Second)
 
 		// Verify pruning in Docker logs
 		logs := getDockerLogs("sandbox-log-server", 50)
-		assert.Contains(t, logs, "connection idle for 60s. Pruning zombie.", 
+		assert.Contains(t, logs, "connection idle for 60s. Pruning zombie.",
 			"Server should have pruned the idle connection")
-		
+
 		// Verify socket is closed
 		_ = conn.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
 		one := make([]byte, 1)
@@ -114,7 +114,7 @@ func TestLogServerHardeningScenario(t *testing.T) {
 		// Verify timeout in Docker logs
 		logs := getDockerLogs("sandbox-log-server", 20)
 		assert.Contains(t, logs, "handshake timeout from", "Server should log a handshake timeout")
-		
+
 		// Verify socket is closed
 		_ = conn.SetReadDeadline(time.Now().Add(100 * time.Millisecond))
 		one := make([]byte, 1)
