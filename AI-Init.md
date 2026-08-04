@@ -2,6 +2,11 @@
 microservice: sandbox-testing
 type: governance
 status: active
+tags:
+- '#service/sandbox-testing'
+- '#type/governance'
+- '#state/active'
+- '#zone/3-fleet'
 ---
 
 # ⚡ AI Initialization: sandbox-testing

@@ -1,8 +1,13 @@
 ---
-title: "Sandbox Testing Hub"
+title: Sandbox Testing Hub
 type: repository
 status: active
 microservice: sandbox-testing
+tags:
+- '#service/sandbox-testing'
+- '#type/repository'
+- '#state/active'
+- '#zone/3-fleet'
 ---
 
 # 🧪 Sandbox Testing Hub

@@ -73,3 +73,11 @@ temp/
 
 # Chroma DB
 .chroma_db*
+
+# --- Standard Ecosystem Protections ---
+*.log
+*.pyc
+.venv/
+.pytest_cache/
+.coverage
+htmlcov/

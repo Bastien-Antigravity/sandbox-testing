@@ -50,8 +50,4 @@ require (
 	modernc.org/memory v1.11.0 // indirect
 )
 
-replace github.com/Bastien-Antigravity/microservice-toolbox => ../../../microservice-toolbox
 
-replace github.com/Bastien-Antigravity/flexible-logger => ../../../flexible-logger
-
-replace github.com/Bastien-Antigravity/safe-socket => ../../../safe-socket
