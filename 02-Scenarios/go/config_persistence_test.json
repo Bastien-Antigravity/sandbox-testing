@@ -1,0 +1,14 @@
+{
+  "persist": {
+    "status": "dirty"
+  },
+  "stress_test": {
+    "global_key": "val_from_42"
+  },
+  "sync_test": {
+    "key_a": "value_from_a_1785948225"
+  },
+  "test_section": {
+    "key": "val_4"
+  }
+}

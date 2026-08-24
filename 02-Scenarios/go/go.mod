@@ -4,12 +4,13 @@ go 1.25.8
 
 require (
 	capnproto.org/go/capnp/v3 v3.1.0-alpha.2
-	github.com/Bastien-Antigravity/distributed-config v1.9.922
-	github.com/Bastien-Antigravity/flexible-logger v1.3.3
-	github.com/Bastien-Antigravity/microservice-toolbox v0.0.0
-	github.com/Bastien-Antigravity/notif-server v1.1.5
-	github.com/Bastien-Antigravity/safe-socket v1.8.2
-	github.com/Bastien-Antigravity/universal-logger v1.4.2
+	github.com/Bastien-Antigravity/distributed-config v0.0.1
+	github.com/Bastien-Antigravity/flexible-logger v0.0.1
+	github.com/Bastien-Antigravity/microservice-toolbox v0.0.1
+	github.com/Bastien-Antigravity/microservice-toolbox/go v0.0.1
+	github.com/Bastien-Antigravity/notif-server v0.0.1
+	github.com/Bastien-Antigravity/safe-socket v0.0.1
+	github.com/Bastien-Antigravity/universal-logger v0.0.1
 	github.com/lib/pq v1.11.2
 	github.com/nats-io/nats.go v1.52.0
 	github.com/stretchr/testify v1.11.1
@@ -50,4 +51,12 @@ require (
 	modernc.org/memory v1.11.0 // indirect
 )
 
-
+replace (
+	github.com/Bastien-Antigravity/microservice-toolbox => ../../../microservice-toolbox
+	github.com/Bastien-Antigravity/microservice-toolbox/go => ../../../microservice-toolbox
+	github.com/Bastien-Antigravity/universal-logger => ../../../universal-logger
+	github.com/Bastien-Antigravity/distributed-config => ../../../distributed-config
+	github.com/Bastien-Antigravity/safe-socket => ../../../safe-socket
+	github.com/Bastien-Antigravity/flexible-logger => ../../../flexible-logger
+	github.com/Bastien-Antigravity/notif-server => ../../../notif-server
+)

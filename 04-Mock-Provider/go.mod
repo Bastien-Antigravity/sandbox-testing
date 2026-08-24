@@ -3,7 +3,7 @@ module github.com/Bastien-Antigravity/sandbox-testing/04-Mock-Provider
 go 1.25.4
 
 require (
-	github.com/Bastien-Antigravity/microservice-toolbox v0.0.0
+	github.com/Bastien-Antigravity/microservice-toolbox v0.0.1
 	github.com/nats-io/nats.go v1.49.0
 )
 
