@@ -4,12 +4,11 @@ go 1.25.8
 
 require (
 	capnproto.org/go/capnp/v3 v3.1.0-alpha.2
-	github.com/Bastien-Antigravity/distributed-config v0.0.1
+	github.com/Bastien-Antigravity/distributed-config v1.9.922
 	github.com/Bastien-Antigravity/flexible-logger v0.0.1
 	github.com/Bastien-Antigravity/microservice-toolbox v0.0.1
-	github.com/Bastien-Antigravity/microservice-toolbox/go v0.0.1
 	github.com/Bastien-Antigravity/notif-server v0.0.1
-	github.com/Bastien-Antigravity/safe-socket v0.0.1
+	github.com/Bastien-Antigravity/safe-socket v1.8.2
 	github.com/Bastien-Antigravity/universal-logger v0.0.1
 	github.com/lib/pq v1.11.2
 	github.com/nats-io/nats.go v1.52.0
@@ -29,7 +28,6 @@ require (
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.18.5 // indirect
-	github.com/kr/text v0.2.0 // indirect
 	github.com/mattn/go-isatty v0.0.20 // indirect
 	github.com/mattn/go-sqlite3 v1.14.22 // indirect
 	github.com/nats-io/nkeys v0.4.15 // indirect
@@ -52,11 +50,11 @@ require (
 )
 
 replace (
+	github.com/Bastien-Antigravity/distributed-config => ../../../distributed-config
+	github.com/Bastien-Antigravity/flexible-logger => ../../../flexible-logger
 	github.com/Bastien-Antigravity/microservice-toolbox => ../../../microservice-toolbox
 	github.com/Bastien-Antigravity/microservice-toolbox/go => ../../../microservice-toolbox
-	github.com/Bastien-Antigravity/universal-logger => ../../../universal-logger
-	github.com/Bastien-Antigravity/distributed-config => ../../../distributed-config
-	github.com/Bastien-Antigravity/safe-socket => ../../../safe-socket
-	github.com/Bastien-Antigravity/flexible-logger => ../../../flexible-logger
 	github.com/Bastien-Antigravity/notif-server => ../../../notif-server
+	github.com/Bastien-Antigravity/safe-socket => ../../../safe-socket
+	github.com/Bastien-Antigravity/universal-logger => ../../../universal-logger
 )

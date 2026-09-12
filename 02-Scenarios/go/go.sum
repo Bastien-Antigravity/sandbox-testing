@@ -1,16 +1,9 @@
 capnproto.org/go/capnp/v3 v3.1.0-alpha.2 h1:93ISpqHf2/3WQlfrBP0tT8Dg/RQc3uq6DV36vN0ePWk=
 capnproto.org/go/capnp/v3 v3.1.0-alpha.2/go.mod h1:2vT5D2dtG8sJGEoEKU17e+j7shdaYp1Myl8X03B3hmc=
-github.com/Bastien-Antigravity/distributed-config v1.9.922 h1:oOQPQ1o/a/WHqzl/4t+W9mBE8VyovAX0GjVu1qdtgsg=
-github.com/Bastien-Antigravity/distributed-config v1.9.922/go.mod h1:bMZEvfAUTmidVW1oa0iFrOXfP61wgG+Q6dUswhvGYPI=
-github.com/Bastien-Antigravity/notif-server v1.1.5 h1:5I9BmX2HG3eKozIpTPM5U052ZojmS9AeGTIMk8MkcdE=
-github.com/Bastien-Antigravity/notif-server v1.1.5/go.mod h1:WHTwLDD0palSbWluZphyybs/q/6bmLHyW7FKLobdilo=
-github.com/Bastien-Antigravity/universal-logger v1.4.2 h1:rgmbQfzB9jgMrURVfZhycE0PzwQl2mXCFZEDvpRUAC8=
-github.com/Bastien-Antigravity/universal-logger v1.4.2/go.mod h1:IESpGr3oIR8tgYUUj/kEpibkUleV/HKeJg+7EqujAwk=
 github.com/cespare/xxhash/v2 v2.3.0 h1:UL815xU9SqsFlibzuggzjXhog7bL6oX9BbNZnL2UFvs=
 github.com/cespare/xxhash/v2 v2.3.0/go.mod h1:VGX0DQ3Q6kWi7AoAeZDth3/j3BFtOZR5XLFGgcrjCOs=
 github.com/colega/zeropool v0.0.0-20230505084239-6fb4a4f75381 h1:d5EKgQfRQvO97jnISfR89AiCCCJMwMFoSxUiU0OGCRU=
 github.com/colega/zeropool v0.0.0-20230505084239-6fb4a4f75381/go.mod h1:OU76gHeRo8xrzGJU3F3I1CqX1ekM8dfJw0+wPeMwnp0=
-github.com/creack/pty v1.1.9/go.mod h1:oKZEueFk5CKHvIhNR5MUki03XCEU+Q6VDXinZuGJ33E=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc h1:U9qPSI2PIWSS1VwoXQT9A3Wy9MM3WgvqSxFWenqJduM=
 github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/dustin/go-humanize v1.0.1 h1:GzkhY7T5VNhEkwH0PVJgjz+fX1rhBrR7pRT3mDkpeCY=

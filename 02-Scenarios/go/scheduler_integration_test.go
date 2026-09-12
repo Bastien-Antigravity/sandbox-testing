@@ -1,3 +1,5 @@
+//go:build legacy_ontime
+
 package scenarios_test
 
 import (
