@@ -17,20 +17,26 @@ import (
 func TestScenario_FleetStopCommandPreserved(t *testing.T) {
 	deployDir := resolveDockerDeploymentDir(t)
 	fleetPyPath := filepath.Join(deployDir, "scripts", "fleet.py")
+	opsPyPath := filepath.Join(deployDir, "scripts", "operations.py")
 
 	contentBytes, err := os.ReadFile(fleetPyPath)
 	require.NoError(t, err, "scripts/fleet.py must exist")
 	content := string(contentBytes)
 
-	// 1. Must define stop_all routine
-	assert.True(t, strings.Contains(content, "def stop_all"), "fleet.py must define stop_all routine")
+	opsBytes, err := os.ReadFile(opsPyPath)
+	require.NoError(t, err, "scripts/operations.py must exist")
+	opsContent := string(opsBytes)
+
+	// 1. Must define stop_all routine and dispatch 'stop' command
+	assert.True(t, strings.Contains(opsContent, "def stop_all"), "operations.py must define stop_all routine")
+	assert.True(t, strings.Contains(content, "stop_all"), "fleet.py must import/invoke stop_all")
 	assert.True(t, strings.Contains(content, `"stop"`), "fleet.py must handle 'stop' command")
 
 	// 2. Must stop docker compose, standalone containers, and native processes
-	assert.True(t, strings.Contains(content, `"down"`), "stop_all must execute docker compose down")
-	assert.True(t, strings.Contains(content, "nats-server"), "stop_all must cover nats-server")
-	assert.True(t, strings.Contains(content, "timescale-db"), "stop_all must cover timescale-db")
-	assert.True(t, strings.Contains(content, "watchdog-agent"), "stop_all must cover watchdog-agent")
+	assert.True(t, strings.Contains(opsContent, `"down"`), "stop_all must execute docker compose down")
+	assert.True(t, strings.Contains(opsContent, "nats-server"), "stop_all must cover nats-server")
+	assert.True(t, strings.Contains(opsContent, "timescale-db"), "stop_all must cover timescale-db")
+	assert.True(t, strings.Contains(opsContent, "watchdog-agent"), "stop_all must cover watchdog-agent")
 }
 
 // TestScenario_ObsoletePlatformScriptsRemoved asserts that redundant, duplicated platform
@@ -99,14 +105,13 @@ func TestScenario_WatchdogNatsCrossPlatformResilience(t *testing.T) {
 func TestScenario_ConfigExplicitHierarchy(t *testing.T) {
 	deployDir := resolveDockerDeploymentDir(t)
 
-	// 1. Verify config/environments/
-	envDir := filepath.Join(deployDir, "config", "environments")
-	assert.FileExists(t, filepath.Join(envDir, "native.yaml"), "native.yaml monolithic profile must exist")
-	assert.FileExists(t, filepath.Join(envDir, "docker.yaml"), "docker.yaml monolithic profile must exist")
-	assert.FileExists(t, filepath.Join(envDir, "standalone.yaml"), "standalone.yaml symlink must exist")
+	// 1. Verify modes/local/config/
+	localConfigDir := filepath.Join(deployDir, "modes", "local", "config")
+	assert.FileExists(t, filepath.Join(localConfigDir, "native.yaml"), "native.yaml monolithic profile must exist in modes/local/config")
+	assert.FileExists(t, filepath.Join(localConfigDir, "standalone.yaml"), "standalone.yaml symlink must exist in modes/local/config")
 
-	// 2. Verify config/services/
-	servicesDir := filepath.Join(deployDir, "config", "services")
+	// 2. Verify modes/docker/config/services/
+	servicesDir := filepath.Join(deployDir, "modes", "docker", "config", "services")
 	expectedSlices := []string{
 		"config-server.yaml",
 		"log-server.yaml",
@@ -119,17 +124,11 @@ func TestScenario_ConfigExplicitHierarchy(t *testing.T) {
 		assert.FileExists(t, filepath.Join(servicesDir, slice), "Dedicated slice %s must exist", slice)
 	}
 
-	// 3. Verify config/keys/
-	keysDir := filepath.Join(deployDir, "config", "keys")
-	assert.FileExists(t, filepath.Join(keysDir, "public.pem"), "public.pem must exist in config/keys")
-	assert.FileExists(t, filepath.Join(keysDir, "private.pem"), "private.pem must exist in config/keys")
-
-	// 4. Verify shared-config/ backwards-compatibility symlink layer
-	sharedDir := filepath.Join(deployDir, "shared-config")
-	assert.FileExists(t, filepath.Join(sharedDir, "native.yaml"))
-	assert.FileExists(t, filepath.Join(sharedDir, "docker.yaml"))
-	assert.FileExists(t, filepath.Join(sharedDir, "standalone.yaml"))
-	assert.FileExists(t, filepath.Join(sharedDir, "CONFIG_STANDARD.md"))
+	// 3. Verify modes/ directory structure
+	modesDir := filepath.Join(deployDir, "modes")
+	assert.DirExists(t, filepath.Join(modesDir, "local"))
+	assert.DirExists(t, filepath.Join(modesDir, "docker"))
+	assert.DirExists(t, filepath.Join(modesDir, "production"))
 }
 
 // TestScenario_PythonFleetOrchestratorIntegrity validates that the unified Python 3

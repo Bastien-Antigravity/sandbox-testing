@@ -37,7 +37,7 @@ func resolveDockerDeploymentDir(t *testing.T) string {
 // YAML slices follow the ecosystem standard: minimal, isolated, valid YAML, and loadable.
 func TestScenario_DockerServiceSlicesIntegrity(t *testing.T) {
 	deployDir := resolveDockerDeploymentDir(t)
-	servicesDir := filepath.Join(deployDir, "config", "services")
+	servicesDir := filepath.Join(deployDir, "modes", "docker", "config", "services")
 
 	expectedSlices := map[string]struct {
 		serviceKey   string
@@ -187,22 +187,38 @@ func TestScenario_DockerComposeStandardCompliance(t *testing.T) {
 	}
 }
 
-// TestScenario_DockerCrossPlatformKeyFallback validates that the repository
-// provides a self-contained fallback key pair in config/keys/ allowing any machine
-// to run the stack immediately without missing-file errors.
+// TestScenario_DockerCrossPlatformKeyFallback validates that external safe keys
+// (outside Git repositories, e.g. in /etc/bastien or ~/.bastien/keys) are used for encryption.
 func TestScenario_DockerCrossPlatformKeyFallback(t *testing.T) {
-	deployDir := resolveDockerDeploymentDir(t)
-	privKeyPath := filepath.Join(deployDir, "config", "keys", "private.pem")
-	pubKeyPath := filepath.Join(deployDir, "config", "keys", "public.pem")
+	homeDir, _ := os.UserHomeDir()
+	candidatePaths := [][]string{
+		{"/etc/bastien/private.pem", "/etc/bastien/public.pem"},
+		{filepath.Join(homeDir, ".bastien", "keys", "private.pem"), filepath.Join(homeDir, ".bastien", "keys", "public.pem")},
+	}
 
-	// 1. Files must exist
+	var privKeyPath, pubKeyPath string
+	for _, pair := range candidatePaths {
+		if _, err := os.Stat(pair[0]); err == nil {
+			if _, err := os.Stat(pair[1]); err == nil {
+				privKeyPath, pubKeyPath = pair[0], pair[1]
+				break
+			}
+		}
+	}
+
+	if privKeyPath == "" {
+		t.Skip("External key pair not found in /etc/bastien or ~/.bastien/keys; skipping live decryption test")
+		return
+	}
+
+	// 1. Files must exist and be readable
 	privBytes, err := os.ReadFile(privKeyPath)
-	require.NoError(t, err, "Fallback private key config/keys/private.pem must exist")
+	require.NoError(t, err, "External private key must exist")
 	assert.NotEmpty(t, privBytes)
 	pubBytes, err := os.ReadFile(pubKeyPath)
-	require.NoError(t, err, "Fallback public key config/keys/public.pem must exist")
+	require.NoError(t, err, "External public key must exist")
 
-	// 2. Cryptographic roundtrip test with fallback keys
+	// 2. Cryptographic roundtrip test with external keys
 	testSecret := "docker-portable-secret-test-string"
 	encVal, err := secret.Encrypt(testSecret, string(pubBytes))
 	require.NoError(t, err)
@@ -211,5 +227,5 @@ func TestScenario_DockerCrossPlatformKeyFallback(t *testing.T) {
 	t.Setenv("BASTIEN_PRIVATE_KEY_PATH", privKeyPath)
 	decVal, err := secret.Decrypt(encVal)
 	require.NoError(t, err)
-	assert.Equal(t, testSecret, decVal, "Decrypted secret must match original using repository fallback key")
+	assert.Equal(t, testSecret, decVal, "Decrypted secret must match original using external key")
 }
