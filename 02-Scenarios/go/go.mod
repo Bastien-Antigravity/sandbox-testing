@@ -4,16 +4,20 @@ go 1.25.8
 
 require (
 	capnproto.org/go/capnp/v3 v3.1.0-alpha.2
-	github.com/Bastien-Antigravity/distributed-config v1.9.922
+	github.com/Bastien-Antigravity/distributed-config v0.0.1
 	github.com/Bastien-Antigravity/flexible-logger v0.0.1
 	github.com/Bastien-Antigravity/microservice-toolbox v0.0.1
 	github.com/Bastien-Antigravity/notif-server v0.0.1
-	github.com/Bastien-Antigravity/safe-socket v1.8.2
+	github.com/Bastien-Antigravity/safe-socket v0.0.1
 	github.com/Bastien-Antigravity/universal-logger v0.0.1
+	github.com/Bastien-Antigravity/watchdog-agent v0.0.0-00010101000000-000000000000
+	github.com/Bastien-Antigravity/web-interface v0.0.0-00010101000000-000000000000
+	github.com/alexedwards/scs/v2 v2.9.0
 	github.com/lib/pq v1.11.2
 	github.com/nats-io/nats.go v1.52.0
 	github.com/stretchr/testify v1.11.1
 	google.golang.org/protobuf v1.36.11
+	gopkg.in/yaml.v3 v3.0.1
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.31.1
 	modernc.org/sqlite v1.52.0
@@ -25,6 +29,8 @@ require (
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/edsrzf/mmap-go v1.2.0 // indirect
 	github.com/google/uuid v1.6.0 // indirect
+	github.com/gorilla/csrf v1.7.3 // indirect
+	github.com/gorilla/securecookie v1.1.2 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
 	github.com/klauspost/compress v1.18.5 // indirect
@@ -43,18 +49,19 @@ require (
 	golang.org/x/text v0.37.0 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20260523011958-0a33c5d7ca68 // indirect
 	google.golang.org/grpc v1.81.1 // indirect
-	gopkg.in/yaml.v3 v3.0.1 // indirect
 	modernc.org/libc v1.72.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
 )
 
 replace (
+	github.com/Bastien-Antigravity/config-server => ../../../config-server
 	github.com/Bastien-Antigravity/distributed-config => ../../../distributed-config
 	github.com/Bastien-Antigravity/flexible-logger => ../../../flexible-logger
 	github.com/Bastien-Antigravity/microservice-toolbox => ../../../microservice-toolbox
-	github.com/Bastien-Antigravity/microservice-toolbox/go => ../../../microservice-toolbox
 	github.com/Bastien-Antigravity/notif-server => ../../../notif-server
 	github.com/Bastien-Antigravity/safe-socket => ../../../safe-socket
 	github.com/Bastien-Antigravity/universal-logger => ../../../universal-logger
+	github.com/Bastien-Antigravity/watchdog-agent => ../../../watchdog-agent
+	github.com/Bastien-Antigravity/web-interface => ../../../web-interface
 )
