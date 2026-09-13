@@ -152,8 +152,8 @@ func TestScenario_PythonFleetOrchestratorIntegrity(t *testing.T) {
 		assert.False(t, strings.Contains(content, forbidden), "fleet.py must not require third-party package: %s", forbidden)
 	}
 
-	// 3. Must cover all primary commands
-	expectedCommands := []string{"local", "docker-local", "distributed", "prod", "compile", "rebuild", "status", "stop", "doctor", "guide"}
+	// 3. Must cover all primary canonical commands
+	expectedCommands := []string{"local", "docker", "prod", "production", "compile", "rebuild", "status", "stop", "doctor", "guide"}
 	for _, cmd := range expectedCommands {
 		assert.True(t, strings.Contains(content, `"`+cmd+`"`), "fleet.py must handle command: %s", cmd)
 	}
