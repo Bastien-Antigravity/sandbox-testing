@@ -11,9 +11,6 @@ capabilities:
     file_system:
         data_path: ./fs_data
         temp_path: ./fs_temp
-    jupyter:
-        ip: 127.0.0.2
-        port: "8888"
     log_server:
         ip: ${LS_IP:127.0.0.2}
         port: ${LS_PORT:9020}
@@ -28,6 +25,15 @@ capabilities:
         ip: ${TR_IP:127.0.0.2}
         port: ${TR_PORT:1863}
         token: ${TR_TOKEN}
+    rag_engine:
+        db_name: ${RAG_DBNAME:obsidiandb}
+        user: ${RAG_DBUSER:dbuser}
+        password: ${RAG_DBPASSWORD}
+        ip: ${RG_IP:127.0.0.2}
+        port: ${RG_PORT:8080}
+        grpc_ip: ${RG_GRPC_IP:127.0.0.2}
+        grpc_port: ${RG_GRPC_PORT:8091}
+        rest_port: ${RG_REST_PORT:8093}
     timescale_db:
         db_name: ${TS_DBNAME:maindb}
         ip: ${TS_IP:127.0.0.2}

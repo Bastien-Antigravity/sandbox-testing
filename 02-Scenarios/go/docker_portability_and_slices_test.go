@@ -185,6 +185,40 @@ func TestScenario_DockerComposeStandardCompliance(t *testing.T) {
 			}
 		}
 	}
+
+	// 4. rag-engine MCP Port Parity and Volume Mounts
+	ragSvc, ok := composeMap.Services["rag-engine"]
+	require.True(t, ok, "rag-engine must be declared in docker-compose.yaml")
+
+	hasMcpPort := false
+	hasDashboardPort := false
+	for _, p := range ragSvc.Ports {
+		if strings.Contains(p, "8090") {
+			hasMcpPort = true
+		}
+		if strings.Contains(p, "8082") {
+			hasDashboardPort = true
+		}
+	}
+	assert.True(t, hasMcpPort, "rag-engine must expose port 8090 for MCP SSE connectivity")
+	assert.True(t, hasDashboardPort, "rag-engine must expose port 8082 for RAG dashboard")
+
+	hasWorkspaceMount := false
+	hasCacheMount := false
+	for _, v := range ragSvc.Volumes {
+		if strings.Contains(v, "/workspace") {
+			hasWorkspaceMount = true
+		}
+		if strings.Contains(v, "rag_cache") {
+			hasCacheMount = true
+		}
+	}
+	assert.True(t, hasWorkspaceMount, "rag-engine must mount /workspace host notes/codebase")
+	assert.True(t, hasCacheMount, "rag-engine must mount .rag_cache volume for state persistence")
+
+	// 5. Verify zero references to ~/.bastien/bin across compose content
+	assert.False(t, strings.Contains(string(content), ".bastien/bin"),
+		"docker-compose.yaml must not reference .bastien/bin")
 }
 
 // TestScenario_DockerCrossPlatformKeyFallback validates that external safe keys

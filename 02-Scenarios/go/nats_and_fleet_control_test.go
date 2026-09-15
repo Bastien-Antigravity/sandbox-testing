@@ -90,14 +90,20 @@ func TestScenario_WatchdogNatsCrossPlatformResilience(t *testing.T) {
 	assert.NoError(t, err)
 	t.Logf("IsOccupantFleetService for mock port %s returned: %v", portStr, isFleet)
 
-	// 3. Verify registry.go only falls back to the bundled Mach-O binary on darwin
+	// 3. Verify registry.go lookup order (PATH -> workspace watchdog-agent/nats -> ~/.local/bin) and zero .bastien
 	registryGoPath := filepath.Join(deployDir, "..", "watchdog-agent", "src", "supervisor", "registry.go")
 	regContent, err := os.ReadFile(registryGoPath)
 	require.NoError(t, err)
 	rStr := string(regContent)
 
-	assert.True(t, strings.Contains(rStr, `runtime.GOOS == "darwin"`),
-		"registry.go must restrict bundled nats-server execution strictly to macOS (darwin)")
+	assert.True(t, strings.Contains(rStr, `exec.LookPath`),
+		"registry.go must first look in system PATH via exec.LookPath")
+	assert.True(t, strings.Contains(rStr, `filepath.Join(rootDir, "watchdog-agent", "nats"`),
+		"registry.go must fall back to workspace watchdog-agent/nats")
+	assert.True(t, strings.Contains(rStr, `filepath.Join(homeDir, ".local", "bin"`),
+		"registry.go must fall back to ~/.local/bin")
+	assert.False(t, strings.Contains(rStr, `.bastien`),
+		"registry.go must not contain any reference to .bastien")
 }
 
 // TestScenario_ConfigExplicitHierarchy validates that the newly organized config
