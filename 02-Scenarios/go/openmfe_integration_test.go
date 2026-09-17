@@ -14,7 +14,7 @@ import (
 func TestOpenMFERegistrationScenario(t *testing.T) {
 	fmt.Println(">>> Scenario Test: Verifying OpenMFE Dynamic Microservice Registration & Routing")
 
-	webURL := "http://127.0.0.1:8000"
+	webURL := "http://127.0.0.1:5000"
 
 	// 1. Check if web-interface is reachable
 	resp, err := http.Get(webURL)

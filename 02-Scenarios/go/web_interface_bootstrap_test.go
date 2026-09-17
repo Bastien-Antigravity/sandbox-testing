@@ -14,8 +14,8 @@ import (
 func TestWebInterfaceBootstrap(t *testing.T) {
 	fmt.Println(">>> Scenario Test: Verifying Web Interface Bootstrap & Configuration Injection")
 
-	// Retry connecting to web-interface (port 8000 or 8080)
-	urls := []string{"http://127.0.0.1:8000", "http://127.0.0.1:8080"}
+	// Retry connecting to web-interface (canonical port 5000)
+	urls := []string{"http://127.0.0.1:5000", "http://127.0.0.1:8000"}
 	var resp *http.Response
 	var err error
 

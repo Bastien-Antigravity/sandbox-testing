@@ -43,4 +43,4 @@ capabilities:
         user: ${TS_USER}
     web_interface:
         ip: ${WB_IP:127.0.0.2}
-        port: ${WB_PORT:8080}
+        port: ${WB_PORT:5000}

@@ -45,8 +45,10 @@ func (m *scenarioMockLogger) Log(level unilog_interfaces.Level, format string, a
 func (m *scenarioMockLogger) SetLevel(level unilog_interfaces.Level)                            {}
 func (m *scenarioMockLogger) GetLevel() unilog_interfaces.Level                                 { return unilog_interfaces.LevelInfo }
 func (m *scenarioMockLogger) SetCallerSkip(skip int)                                     {}
+func (m *scenarioMockLogger) LogWithCaller(level unilog_interfaces.Level, msg, file, line, function, module string) {}
 func (m *scenarioMockLogger) SetMetadata(metadata map[string]string)                     {}
 func (m *scenarioMockLogger) AddMetadata(key, value string)                              {}
+func (m *scenarioMockLogger) GetMetadata() map[string]string                             { return nil }
 func (m *scenarioMockLogger) Close()                                                     {}
 
 // generateTestKeyPair creates an in-memory RSA key pair encoded as PEM strings.
