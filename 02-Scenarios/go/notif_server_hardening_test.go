@@ -61,7 +61,7 @@ func TestNotifServerHardeningScenario(t *testing.T) {
 		// 2. Send 5000 messages rapidly
 		burstCount := 5000
 		fmt.Printf(">>> Sending %d notifications rapidly...\n", burstCount)
-		handler := notifier.NewNotifHandler("test", nil)
+		handler := notifier.NewNotifHandler("test")
 		start := time.Now()
 
 		for i := 0; i < burstCount; i++ {
