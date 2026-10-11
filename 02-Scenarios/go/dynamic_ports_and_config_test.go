@@ -42,6 +42,8 @@ import (
 	distributed_config "github.com/Bastien-Antigravity/distributed-config"
 	distconf_loader "github.com/Bastien-Antigravity/distributed-config/src/loader"
 	toolbox_config "github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/config"
+	watchdog_supervisor "github.com/Bastien-Antigravity/watchdog-agent/src/supervisor"
+	watchdog_utils "github.com/Bastien-Antigravity/watchdog-agent/src/utils"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"gopkg.in/yaml.v3"
@@ -263,6 +265,138 @@ func TestScenario_DynamicPortShiftingAndZeroHardcodedFallbacks(t *testing.T) {
 		case <-time.After(2 * time.Second):
 			t.Fatal("Timeout waiting for dynamic listener connection")
 		}
+	})
+
+	t.Run("WatchdogSupervisor_RegistryDynamicPortShiftingAndIPAssignment", func(t *testing.T) {
+		// 1. Build a custom shifted config YAML with shifted ports and multi-node IP assignments
+		customYaml := map[string]any{
+			"common": map[string]any{
+				"name":      "watchdog-scenario-test",
+				"public_ip": "127.0.0.1",
+			},
+			"capabilities": map[string]any{
+				"web_interface": map[string]any{
+					"ip":        "127.0.0.1",
+					"port":      "15000",
+					"grpc_ip":   "127.0.0.1",
+					"grpc_port": "18001",
+				},
+				"config_server": map[string]any{
+					"ip":        "192.168.10.99", // Remote node assignment
+					"port":      "13306",
+					"grpc_port": "13307",
+					"rest_port": "13308",
+				},
+				"log_server": map[string]any{
+					"ip":   "127.0.0.1",
+					"port": "19020",
+				},
+				"notif_server": map[string]any{
+					"ip":   "127.0.0.1",
+					"port": "11026",
+				},
+				"tele_remote": map[string]any{
+					"ip":   "127.0.0.1",
+					"port": "11863",
+				},
+				"nats_server": map[string]any{
+					"ip":   "127.0.0.1",
+					"port": "14222",
+				},
+				"timescale_db": map[string]any{
+					"ip":   "127.0.0.1",
+					"port": "15432",
+				},
+				"base_scripts": map[string]any{
+					"ip":   "127.0.0.1",
+					"port": "18085",
+				},
+			},
+		}
+
+		bytes, err := yaml.Marshal(customYaml)
+		require.NoError(t, err)
+
+		tempFile, err := os.CreateTemp("", "watchdog-shifted-config-*.yaml")
+		require.NoError(t, err)
+		defer os.Remove(tempFile.Name())
+
+		_, err = tempFile.Write(bytes)
+		require.NoError(t, err)
+		_ = tempFile.Close()
+
+		distCfg := distributed_config.New("standalone")
+		err = distconf_loader.LoadConfigFromFile(distCfg.Config, tempFile.Name())
+		require.NoError(t, err)
+
+		appConfig := &toolbox_config.AppConfig{Config: distCfg}
+
+		// 2. Register services using watchdog supervisor
+		watchdog_supervisor.RegisterServices(workspaceRoot, "127.0.0.1", appConfig)
+		require.NotEmpty(t, watchdog_supervisor.Services, "Supervisor services must not be empty")
+
+		// 3. Verify that shifted ports were applied to registered supervisor services (NO canonical fallbacks)
+		expectedPorts := map[string]string{
+			"web-interface": "15000",
+			"log-server":    "19020",
+			"config-server": "13306",
+			"notif-server":  "11026",
+			"tele-remote":   "11863",
+			"nats-server":   "14222",
+			"timescale-db":  "15432",
+			"start-squad":   "18085",
+		}
+
+		for svcName, expPort := range expectedPorts {
+			svc := watchdog_supervisor.FindServiceByName(svcName)
+			require.NotNil(t, svc, "Service %s must be present in supervisor registry", svcName)
+			assert.Equal(t, expPort, svc.Port,
+				"DYNAMIC INVARIANT: %s must have shifted port %s, got %s", svcName, expPort, svc.Port)
+		}
+
+		// 4. Verify IP assignment and multi-node local vs remote filtering
+		configSvc := watchdog_supervisor.FindServiceByName("config-server")
+		require.NotNil(t, configSvc)
+		assert.Equal(t, "192.168.10.99", configSvc.IP, "config-server IP must reflect custom remote assignment")
+
+		localIPs, err := watchdog_utils.GetLocalIPs()
+		require.NoError(t, err)
+
+		// 127.0.0.1 must be recognized as local
+		assert.True(t, watchdog_utils.IsLocal("127.0.0.1", localIPs), "127.0.0.1 must be recognized as local")
+		assert.True(t, watchdog_utils.IsLocal("", localIPs), "Empty IP must be recognized as local default")
+
+		// 192.168.10.99 is not on this host, so IsLocal must return false
+		assert.False(t, watchdog_utils.IsLocal(configSvc.IP, localIPs),
+			"Remote IP %s must be recognized as non-local so watchdog skips local execution", configSvc.IP)
+
+		// 5. Verify dynamic extraction of child environment variables (simulating watchdog baseEnv setup)
+		wbIP, wbPort := "", ""
+		if addr, err := appConfig.GetListenAddr("web_interface"); err == nil && addr != "" {
+			if host, port, splitErr := net.SplitHostPort(addr); splitErr == nil {
+				wbIP, wbPort = host, port
+			}
+		}
+		assert.Equal(t, "127.0.0.1", wbIP)
+		assert.Equal(t, "15000", wbPort)
+
+		wbGrpcIP, wbGrpcPort := "", ""
+		if addr, err := appConfig.GetGRPCListenAddr("web_interface"); err == nil && addr != "" {
+			if host, port, splitErr := net.SplitHostPort(addr); splitErr == nil {
+				wbGrpcIP, wbGrpcPort = host, port
+			}
+		}
+		assert.Equal(t, "127.0.0.1", wbGrpcIP)
+		assert.Equal(t, "18001", wbGrpcPort)
+
+		bsIP, bsPort := "", ""
+		if addr, err := appConfig.GetListenAddr("base_scripts"); err == nil && addr != "" {
+			if host, port, splitErr := net.SplitHostPort(addr); splitErr == nil {
+				bsIP, bsPort = host, port
+			}
+		}
+		assert.Equal(t, "127.0.0.1", bsIP)
+		assert.Equal(t, "18085", bsPort)
 	})
 }
 
