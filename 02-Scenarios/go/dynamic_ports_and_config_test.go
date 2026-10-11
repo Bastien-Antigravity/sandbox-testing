@@ -101,7 +101,7 @@ func TestScenario_DynamicPortShiftingAndZeroHardcodedFallbacks(t *testing.T) {
 				"port":      19090,
 				"rest_port": 19095,
 			},
-			"nats_server": {
+			"nats": {
 				"port": 14222,
 			},
 			"timescale_db": {
@@ -117,7 +117,7 @@ func TestScenario_DynamicPortShiftingAndZeroHardcodedFallbacks(t *testing.T) {
 			"tele_remote":    1863,
 			"web_interface":  5000,
 			"watchdog_agent": 9095,
-			"nats_server":    4222,
+			"nats":           4222,
 			"timescale_db":   5432,
 		}
 
@@ -299,7 +299,7 @@ func TestScenario_DynamicPortShiftingAndZeroHardcodedFallbacks(t *testing.T) {
 					"ip":   "127.0.0.1",
 					"port": "11863",
 				},
-				"nats_server": map[string]any{
+				"nats": map[string]any{
 					"ip":   "127.0.0.1",
 					"port": "14222",
 				},
@@ -353,6 +353,18 @@ func TestScenario_DynamicPortShiftingAndZeroHardcodedFallbacks(t *testing.T) {
 			assert.Equal(t, expPort, svc.Port,
 				"DYNAMIC INVARIANT: %s must have shifted port %s, got %s", svcName, expPort, svc.Port)
 		}
+
+		// Verify dynamic NATS CLI argument injection (-js, -sd, -p, -a, -m, -n)
+		natsSvc := watchdog_supervisor.FindServiceByName("nats-server")
+		require.NotNil(t, natsSvc)
+		assert.Contains(t, natsSvc.RunArgs, "-js", "nats-server RunArgs must include -js flag")
+		assert.Contains(t, natsSvc.RunArgs, "-sd", "nats-server RunArgs must include dynamic -sd flag")
+		assert.Contains(t, natsSvc.RunArgs, "-p", "nats-server RunArgs must include dynamic -p flag")
+		assert.Contains(t, natsSvc.RunArgs, "14222", "nats-server RunArgs must include shifted port 14222")
+		assert.Contains(t, natsSvc.RunArgs, "-a", "nats-server RunArgs must include dynamic -a flag")
+		assert.Contains(t, natsSvc.RunArgs, "127.0.0.1", "nats-server RunArgs must include dynamic IP")
+		assert.Contains(t, natsSvc.RunArgs, "-m", "nats-server RunArgs must include dynamic -m flag")
+		assert.Contains(t, natsSvc.RunArgs, "-n", "nats-server RunArgs must include dynamic -n flag")
 
 		// 4. Verify IP assignment and multi-node local vs remote filtering
 		configSvc := watchdog_supervisor.FindServiceByName("config-server")
@@ -535,7 +547,7 @@ func TestScenario_CrossLayerPortDriftAudit(t *testing.T) {
 		"tele_remote":    "tele-remote",
 		"web_interface":  "web-interface",
 		"watchdog_agent": "watchdog-agent",
-		"nats_server":    "nats-server",
+		"nats":           "nats-server",
 		"timescale_db":   "timescale-db",
 	}
 

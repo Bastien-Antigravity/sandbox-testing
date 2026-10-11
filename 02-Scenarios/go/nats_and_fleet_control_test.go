@@ -90,7 +90,7 @@ func TestScenario_WatchdogNatsCrossPlatformResilience(t *testing.T) {
 	assert.NoError(t, err)
 	t.Logf("IsOccupantFleetService for mock port %s returned: %v", portStr, isFleet)
 
-	// 3. Verify registry.go lookup order (PATH -> workspace watchdog-agent/nats -> ~/.local/bin) and zero .bastien
+	// 3. Verify registry.go lookup order (PATH -> workspace docker-deployment/bin) and zero .bastien / zero user-home scans
 	registryGoPath := filepath.Join(deployDir, "..", "watchdog-agent", "src", "supervisor", "registry.go")
 	regContent, err := os.ReadFile(registryGoPath)
 	require.NoError(t, err)
@@ -98,12 +98,33 @@ func TestScenario_WatchdogNatsCrossPlatformResilience(t *testing.T) {
 
 	assert.True(t, strings.Contains(rStr, `exec.LookPath`),
 		"registry.go must first look in system PATH via exec.LookPath")
-	assert.True(t, strings.Contains(rStr, `filepath.Join(rootDir, "watchdog-agent", "nats"`),
-		"registry.go must fall back to workspace watchdog-agent/nats")
-	assert.True(t, strings.Contains(rStr, `filepath.Join(homeDir, ".local", "bin"`),
-		"registry.go must fall back to ~/.local/bin")
+	assert.True(t, strings.Contains(rStr, `filepath.Join(rootDir, "docker-deployment", "bin"`),
+		"registry.go must fall back to workspace docker-deployment/bin")
+	assert.False(t, strings.Contains(rStr, `watchdog-agent/nats`),
+		"registry.go must not contain any reference to watchdog-agent/nats")
 	assert.False(t, strings.Contains(rStr, `.bastien`),
 		"registry.go must not contain any reference to .bastien")
+	assert.False(t, strings.Contains(rStr, `.local/bin`),
+		"registry.go must strictly comply with No User-Home Scans rule")
+
+	// 4. Verify native.yaml NATS capability configuration (subject_prefix and JetStream parameters)
+	nativeYamlPath := filepath.Join(deployDir, "modes", "local", "config", "native.yaml")
+	nativeBytes, err := os.ReadFile(nativeYamlPath)
+	require.NoError(t, err)
+	nativeStr := string(nativeBytes)
+
+	assert.True(t, strings.Contains(nativeStr, "subject_prefix: bastien-antigravity"),
+		"native.yaml must define subject_prefix: bastien-antigravity")
+	assert.False(t, strings.Contains(nativeStr, "subject_prefix: antigravity"),
+		"native.yaml must no longer use obsolete subject_prefix: antigravity")
+	assert.True(t, strings.Contains(nativeStr, "jetstream:"),
+		"native.yaml nats capability must configure jetstream")
+	assert.True(t, strings.Contains(nativeStr, "store_dir:"),
+		"native.yaml nats jetstream must configure store_dir")
+	assert.True(t, strings.Contains(nativeStr, "max_memory_store:"),
+		"native.yaml nats jetstream must configure max_memory_store")
+	assert.True(t, strings.Contains(nativeStr, "max_file_store:"),
+		"native.yaml nats jetstream must configure max_file_store")
 }
 
 // TestScenario_ConfigExplicitHierarchy validates that the newly organized config

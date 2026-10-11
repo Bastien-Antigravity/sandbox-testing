@@ -8,6 +8,7 @@ import (
 	"net"
 	"os"
 	"os/exec"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -20,19 +21,29 @@ func TestConfigServerPersistenceRecovery(t *testing.T) {
 	host := "127.0.0.1"
 	tcpPort := "3306"
 	storePath := "config_persistence_test.json"
+	absStorePath, absErr := filepath.Abs(storePath)
+	if absErr != nil {
+		absStorePath = storePath
+	}
 
 	fmt.Println(">>> Starting Config Server Persistence Recovery Scenario")
 
 	// 0. Clean start
 	_ = exec.Command("pkill", "-9", "-x", "config-server").Run()
-	_ = os.Remove(storePath)
+	_ = os.Remove(absStorePath)
 	time.Sleep(2 * time.Second)
 
 	fmt.Println(">>> Starting initial config-server...")
-	initialCmd := exec.Command("../../../config-server/bin/config-server", "--store", storePath)
+	initialCmd := exec.Command("../../../config-server/bin/config-server", "--store", absStorePath)
 	if err := initialCmd.Start(); err != nil {
 		t.Fatalf("Failed to start initial config-server: %v", err)
 	}
+	defer func() {
+		if initialCmd != nil && initialCmd.Process != nil {
+			_ = initialCmd.Process.Kill()
+			_ = initialCmd.Wait()
+		}
+	}()
 	time.Sleep(5 * time.Second)
 
 	// 1. Connect and Push Data
@@ -77,7 +88,13 @@ func TestConfigServerPersistenceRecovery(t *testing.T) {
 	_ = conn.SetReadDeadline(time.Now().Add(5 * time.Second))
 	respLenBuf := make([]byte, 4)
 	_, err = io.ReadFull(conn, respLenBuf)
-	assert.NoError(t, err, "Should receive ACK for PUT")
+	assert.NoError(t, err, "Should receive ACK length for PUT")
+	ackLen := binary.BigEndian.Uint32(respLenBuf)
+	if ackLen > 0 {
+		ackBytes := make([]byte, ackLen)
+		_, err = io.ReadFull(conn, ackBytes)
+		assert.NoError(t, err, "Should read full ACK body")
+	}
 	conn.Close()
 
 	// 2. Wait for background persistence (debounced 5s)
@@ -87,7 +104,11 @@ func TestConfigServerPersistenceRecovery(t *testing.T) {
 	// 3. Restart the Server (Cold Boot)
 	fmt.Println(">>> Phase 2: Restarting config-server (Cold Boot)...")
 
-	// Aggressive Kill
+	// Explicit Kill of initial process
+	if initialCmd != nil && initialCmd.Process != nil {
+		_ = initialCmd.Process.Kill()
+		_ = initialCmd.Wait()
+	}
 	_ = exec.Command("pkill", "-9", "-x", "config-server").Run()
 	time.Sleep(3 * time.Second)
 
@@ -105,11 +126,16 @@ func TestConfigServerPersistenceRecovery(t *testing.T) {
 	}
 
 	// Start it again in background with explicit store
-	goCmd := exec.Command("../../../config-server/bin/config-server", "--store", storePath)
-	err = goCmd.Start()
-	if err != nil {
+	goCmd := exec.Command("../../../config-server/bin/config-server", "--store", absStorePath)
+	if err := goCmd.Start(); err != nil {
 		t.Fatalf("Failed to restart config-server natively: %v", err)
 	}
+	defer func() {
+		if goCmd != nil && goCmd.Process != nil {
+			_ = goCmd.Process.Kill()
+			_ = goCmd.Wait()
+		}
+	}()
 	// Give it a moment to bind
 	time.Sleep(5 * time.Second)
 
