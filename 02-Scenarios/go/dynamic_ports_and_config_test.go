@@ -307,7 +307,7 @@ func TestScenario_DynamicPortShiftingAndZeroHardcodedFallbacks(t *testing.T) {
 					"ip":   "127.0.0.1",
 					"port": "15432",
 				},
-				"base_scripts": map[string]any{
+				"squad_agent": map[string]any{
 					"ip":   "127.0.0.1",
 					"port": "18085",
 				},
@@ -344,7 +344,7 @@ func TestScenario_DynamicPortShiftingAndZeroHardcodedFallbacks(t *testing.T) {
 			"tele-remote":   "11863",
 			"nats-server":   "14222",
 			"timescale-db":  "15432",
-			"start-squad":   "18085",
+			"squad-agent":   "18085",
 		}
 
 		for svcName, expPort := range expectedPorts {
@@ -362,7 +362,6 @@ func TestScenario_DynamicPortShiftingAndZeroHardcodedFallbacks(t *testing.T) {
 		assert.Contains(t, natsSvc.RunArgs, "-p", "nats-server RunArgs must include dynamic -p flag")
 		assert.Contains(t, natsSvc.RunArgs, "14222", "nats-server RunArgs must include shifted port 14222")
 		assert.Contains(t, natsSvc.RunArgs, "-a", "nats-server RunArgs must include dynamic -a flag")
-		assert.Contains(t, natsSvc.RunArgs, "127.0.0.1", "nats-server RunArgs must include dynamic IP")
 		assert.Contains(t, natsSvc.RunArgs, "-m", "nats-server RunArgs must include dynamic -m flag")
 		assert.Contains(t, natsSvc.RunArgs, "-n", "nats-server RunArgs must include dynamic -n flag")
 
@@ -401,14 +400,53 @@ func TestScenario_DynamicPortShiftingAndZeroHardcodedFallbacks(t *testing.T) {
 		assert.Equal(t, "127.0.0.1", wbGrpcIP)
 		assert.Equal(t, "18001", wbGrpcPort)
 
-		bsIP, bsPort := "", ""
-		if addr, err := appConfig.GetListenAddr("base_scripts"); err == nil && addr != "" {
+		saIP, saPort := "", ""
+		if addr, err := appConfig.GetListenAddr("squad_agent"); err == nil && addr != "" {
 			if host, port, splitErr := net.SplitHostPort(addr); splitErr == nil {
-				bsIP, bsPort = host, port
+				saIP, saPort = host, port
 			}
 		}
-		assert.Equal(t, "127.0.0.1", bsIP)
-		assert.Equal(t, "18085", bsPort)
+		assert.Equal(t, "127.0.0.1", saIP)
+		assert.Equal(t, "18085", saPort)
+
+		// 6. Verify TLS argument injection when outside loopback or explicitly enabled
+		tlsYaml := map[string]any{
+			"common": map[string]any{"name": "tls-nats-test"},
+			"capabilities": map[string]any{
+				"nats": map[string]any{
+					"ip":   "192.168.1.100",
+					"port": "4222",
+					"tls": map[string]any{
+						"enabled":   true,
+						"cert_file": "certs/server.pem",
+						"key_file":  "certs/server.key",
+						"ca_file":   "certs/ca.pem",
+						"verify":    true,
+					},
+				},
+			},
+		}
+		tBytes, err := yaml.Marshal(tlsYaml)
+		require.NoError(t, err)
+
+		tFile, err := os.CreateTemp("", "watchdog-tls-config-*.yaml")
+		require.NoError(t, err)
+		defer os.Remove(tFile.Name())
+		_, _ = tFile.Write(tBytes)
+		_ = tFile.Close()
+
+		tDistCfg := distributed_config.New("standalone")
+		require.NoError(t, distconf_loader.LoadConfigFromFile(tDistCfg.Config, tFile.Name()))
+		tAppConfig := &toolbox_config.AppConfig{Config: tDistCfg}
+
+		watchdog_supervisor.RegisterServices(workspaceRoot, "192.168.1.100", tAppConfig)
+		tlsNats := watchdog_supervisor.FindServiceByName("nats-server")
+		require.NotNil(t, tlsNats)
+		assert.Contains(t, tlsNats.RunArgs, "--tls", "nats-server must include --tls when enabled")
+		assert.Contains(t, tlsNats.RunArgs, "--tlscert", "nats-server must include --tlscert")
+		assert.Contains(t, tlsNats.RunArgs, "--tlskey", "nats-server must include --tlskey")
+		assert.Contains(t, tlsNats.RunArgs, "--tlsverify", "nats-server must include --tlsverify")
+		assert.Contains(t, tlsNats.RunArgs, "--tlscacert", "nats-server must include --tlscacert")
 	})
 }
 

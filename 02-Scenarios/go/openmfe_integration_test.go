@@ -24,10 +24,10 @@ func TestOpenMFERegistrationScenario(t *testing.T) {
 	}
 	resp.Body.Close()
 
-	// 2. Register base-scripts microservice via POST /api/v1/register
+	// 2. Register squad-agent microservice via POST /api/v1/register
 	regData := map[string]string{
-		"name":     "base-scripts",
-		"tag":      "base-scripts-mfe",
+		"name":     "squad-agent",
+		"tag":      "squad-agent-mfe",
 		"url":      "http://127.0.0.1:8085/static/mfe.js",
 		"navTitle": "🚀 Squad Control",
 	}
@@ -46,7 +46,7 @@ func TestOpenMFERegistrationScenario(t *testing.T) {
 	if servicesResp != nil {
 		defer servicesResp.Body.Close()
 		bodyBytes, _ := io.ReadAll(servicesResp.Body)
-		assert.Contains(t, string(bodyBytes), "base-scripts", "Registered service 'base-scripts' must appear in /api/v1/services")
+		assert.Contains(t, string(bodyBytes), "squad-agent", "Registered service 'squad-agent' must appear in /api/v1/services")
 	}
 
 	fmt.Println(">>> OpenMFE Registration Scenario completed successfully!")

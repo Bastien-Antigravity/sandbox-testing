@@ -125,6 +125,8 @@ func TestScenario_WatchdogNatsCrossPlatformResilience(t *testing.T) {
 		"native.yaml nats jetstream must configure max_memory_store")
 	assert.True(t, strings.Contains(nativeStr, "max_file_store:"),
 		"native.yaml nats jetstream must configure max_file_store")
+	assert.True(t, strings.Contains(nativeStr, "tls:"),
+		"native.yaml nats capability must configure tls block")
 }
 
 // TestScenario_ConfigExplicitHierarchy validates that the newly organized config

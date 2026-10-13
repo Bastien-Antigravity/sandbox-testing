@@ -32,12 +32,12 @@ import yaml
 TEST_DIR = Path(__file__).resolve().parent
 SANDBOX_DIR = TEST_DIR.parent.parent
 WORKSPACE_ROOT = SANDBOX_DIR.parent
-BASE_SCRIPTS_DIR = WORKSPACE_ROOT / "obsidian-brain" / "08-Base-Scripts"
+SQUAD_AGENT_DIR = WORKSPACE_ROOT / "obsidian-brain" / "08-Squad-Agent"
 DOCKER_DEPLOY_DIR = WORKSPACE_ROOT / "docker-deployment"
 REPO_CONTROL_DIR = WORKSPACE_ROOT / "obsidian-brain" / "05-Fleet-Operation" / "00-Repo-Control"
 
-if str(BASE_SCRIPTS_DIR) not in sys.path:
-    sys.path.insert(0, str(BASE_SCRIPTS_DIR))
+if str(SQUAD_AGENT_DIR) not in sys.path:
+    sys.path.insert(0, str(SQUAD_AGENT_DIR))
 
 from src.lifecycle.scaffold_microservice import (
     generate_go_scaffold,

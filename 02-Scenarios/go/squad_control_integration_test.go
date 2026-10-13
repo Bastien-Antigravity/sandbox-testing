@@ -16,10 +16,10 @@ func TestSquadControlIntegrationScenario(t *testing.T) {
 
 	squadURL := "http://127.0.0.1:8085"
 
-	// 1. Check if Base-Scripts daemon (Port 8085) is reachable
+	// 1. Check if Squad-Agent daemon (Port 8085) is reachable
 	resp, err := http.Get(squadURL + "/api/v1/squad/chat/test_scenario_session")
 	if err != nil {
-		t.Skipf("Skipping live integration test: Base-Scripts daemon on %s is offline (%v)", squadURL, err)
+		t.Skipf("Skipping live integration test: Squad-Agent daemon on %s is offline (%v)", squadURL, err)
 		return
 	}
 	resp.Body.Close()
