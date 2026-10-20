@@ -1,0 +1,11 @@
+# 🧪 Scenario: Ecosystem Tooling Parity and Anti-Pattern Enforcement
+# Spec: [[02-Business-BDD/02-Behavior-Specs/core-standards/FEAT-021-Tooling-Enforcement]]
+
+name: "Ecosystem Tooling Parity and Anti-Pattern Enforcement"
+description: "Verify polyglot bootstrap contracts, dynamic port resolution with zero fallbacks, unified logger sovereignty, and CGO bridge compatibility across the fleet."
+version: "1.0.0"
+
+steps:
+  - action: "step"
+    step: "02-Scenarios/go/ecosystem_tooling_parity_test.go::TestScenario_PolyglotToolingParity"
+    description: "Verify Go bootstrap, Python bootstrap compatibility, dynamic version resolution, and fail-fast port policies."

@@ -1,0 +1,11 @@
+# 🧪 Scenario: Squad Agent Multi-Brain Full Lifecycle & Sandbox Isolation Audit
+# Spec: [[02-Business-BDD/02-Behavior-Specs/squad-agent/FEAT-022-Squad-Agent-Multi-Brain-Lifecycle]]
+
+name: "Squad Agent Multi-Brain Full Lifecycle & Sandbox Isolation Audit"
+description: "End-to-end scenario validating multi-tenant brain isolation, inter-agent NATS room routing, autonomous tool execution guardrails, RAG indexing/querying, and atomic unmerging with zero residual state."
+version: "1.0.0"
+
+steps:
+  - action: "step"
+    step: "02-Scenarios/python/squad_agent_scenario_test.py::run_scenario_tests"
+    description: "Execute 6-stage end-to-end squad agent lifecycle: Brain partitioning -> RAG indexing -> NATS chat routing -> Tool execution -> QA verification -> Atomic unmerging & purge."

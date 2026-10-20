@@ -15,6 +15,7 @@ build:
 
 test:
 	@echo "Running tests (version $(VERSION))..."
+	@if [ -d "02-Scenarios/go" ] && [ -f "02-Scenarios/go/go.mod" ]; then (cd 02-Scenarios/go && go test -v -run "TestScenario_PolyglotToolingParity|TestScenario_DynamicPortShiftingAndZeroHardcodedFallbacks"); fi
 	@if [ -f "go.mod" ]; then go test ./... 2>/dev/null || go test ./src/... 2>/dev/null || true; fi
 	@if [ -f "Cargo.toml" ]; then cargo test 2>/dev/null || true; fi
 	@if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then pytest 2>/dev/null || true; fi
