@@ -55,7 +55,7 @@ func TestLogServerPerformanceScenario(t *testing.T) {
 			log.SetMessage_(fmt.Sprintf("STRESS_TEST_MESSAGE_%d", i))
 			log.SetLoggerName("perf-tester")
 			log.SetLevel(logger_schemas.Level_info)
-			log.SetTimestamp(time.Now().Format(time.RFC3339Nano))
+			log.SetTimestamp(time.Now().UTC().Format(time.RFC3339Nano))
 
 			lBytes, _ := lMsg.MarshalPacked() // packed as required by log-server
 
