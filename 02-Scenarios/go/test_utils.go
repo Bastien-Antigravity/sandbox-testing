@@ -5,10 +5,26 @@ import (
 	"fmt"
 	"net"
 	"os/exec"
+	"time"
 
 	"capnproto.org/go/capnp/v3"
 	"github.com/Bastien-Antigravity/safe-socket/src/schemas"
 )
+
+// WaitForLogServer attempts to connect to log-server until timeout expires.
+// Returns true if reachable, false on timeout, and closes sockets promptly.
+func WaitForLogServer(addr string, timeout time.Duration) bool {
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		conn, err := net.DialTimeout("tcp", addr, 500*time.Millisecond)
+		if err == nil {
+			conn.Close()
+			return true
+		}
+		time.Sleep(100 * time.Millisecond)
+	}
+	return false
+}
 
 // doHandshake performs a standard tcp-hello handshake for testing purposes.
 func doHandshake(conn net.Conn, name string) {

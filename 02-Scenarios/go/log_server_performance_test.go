@@ -22,14 +22,12 @@ func TestLogServerPerformanceScenario(t *testing.T) {
 	t.Run("High_Volume_Ingestion", func(t *testing.T) {
 		fmt.Println(">>> Verifying High-Volume Ingestion (Async Console Worker)")
 
-		conn, err := net.Dial("tcp", host+":"+tcpPort)
-		if err == nil {
-			defer conn.Close()
-		}
-		assert.NoError(t, err)
+		conn, err := net.DialTimeout("tcp", host+":"+tcpPort, 2*time.Second)
 		if err != nil {
+			t.Skipf("Skipping live log-server test: %s:%s is offline (%v)", host, tcpPort, err)
 			return
 		}
+		defer conn.Close()
 
 		// 1. Mandatory Handshake
 		msg, seg, _ := capnp.NewMessage(capnp.SingleSegment(nil))

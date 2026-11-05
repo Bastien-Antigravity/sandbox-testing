@@ -74,7 +74,11 @@ func TestRAGEngineStorage(t *testing.T) {
 
 	// 2. Verify that all required tables exist in the schema
 	t.Run("Verify_Tables_Exist", func(t *testing.T) {
-		tables := []string{"embeddings", "parents", "file_hashes", "codebase_nodes", "codebase_edges", "kms_nodes", "kms_edges", "configuration"}
+		tables := []string{
+			"embeddings", "parents", "lexical_entries", "file_hashes",
+			"codebase_nodes", "codebase_edges", "kms_nodes", "kms_edges",
+			"alignment_links", "configuration",
+		}
 		for _, table := range tables {
 			var exists bool
 			query := `
@@ -119,10 +123,7 @@ func TestRAGEngineStorage(t *testing.T) {
 		var count int
 		query := fmt.Sprintf(`SELECT count(*) FROM "%s".embeddings`, schema)
 		err := db.QueryRow(query).Scan(&count)
-		if err != nil || count == 0 {
-			altQuery := `SELECT count(*) FROM "obsidian-brain".embeddings`
-			_ = db.QueryRow(altQuery).Scan(&count)
-		}
+		assert.NoError(t, err)
 		assert.Greater(t, count, 0, "No indexed embeddings found in table")
 		fmt.Printf(">>> Verified indexed embeddings count: %d\n", count)
 	})

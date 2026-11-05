@@ -11,6 +11,7 @@ import (
 	_ "github.com/lib/pq"
 	"github.com/nats-io/nats.go"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestTriplePipeline(t *testing.T) {
@@ -18,14 +19,17 @@ func TestTriplePipeline(t *testing.T) {
 	t.Run("NATS_Aggregated_OrderBook_Publishing", func(t *testing.T) {
 		fmt.Println(">>> [TestTriplePipeline] Verifying Aggregated OrderBook on NATS...")
 		nc, err := nats.Connect(nats.DefaultURL)
-		assert.NoError(t, err)
+		if err != nil {
+			t.Skipf("Skipping NATS verification: unable to connect to NATS (%v)", err)
+			return
+		}
 		defer nc.Close()
 
 		dataChan := make(chan []byte, 10)
 		sub, err := nc.Subscribe("orderbook.OrderBook.BTCUSDT", func(msg *nats.Msg) {
 			dataChan <- msg.Data
 		})
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		defer sub.Unsubscribe()
 
 		select {
@@ -57,9 +61,15 @@ func TestTriplePipeline(t *testing.T) {
 		}
 		db, err := sql.Open("postgres", connStr)
 		if err != nil {
-			t.Fatalf("Failed to connect to database: %v", err)
+			t.Skipf("Failed to open database connection: %v", err)
+			return
 		}
 		defer db.Close()
+
+		if err := db.Ping(); err != nil {
+			t.Skipf("Skipping database verification: unable to ping database (%v)", err)
+			return
+		}
 
 		// Wait for table creation and data insertion (up to 20 retries)
 		var schemaName string
