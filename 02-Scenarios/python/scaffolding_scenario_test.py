@@ -42,6 +42,8 @@ if str(SQUAD_AGENT_DIR) not in sys.path:
 from src.lifecycle.scaffold_microservice import (
     generate_go_scaffold,
     generate_python_scaffold,
+    generate_rust_scaffold,
+    generate_cpp_scaffold,
     generate_common_files,
     generate_bdd_spec,
 )
@@ -80,14 +82,24 @@ class TestScaffoldingScenario(unittest.TestCase):
         generate_common_files(py_dir, py_svc_name, "python", 8111, "Py Worker in Sandbox", dry_run=False)
         generate_bdd_spec(self.mock_brain, py_svc_name, "Py Worker in Sandbox", dry_run=False)
 
-        print("  ✅ STAGE 1 Complete: Both archetypes scaffolded successfully.")
+        cpp_svc_name = "sandbox-cpp-worker"
+        cpp_dir = self.temp_root / cpp_svc_name
+        generate_cpp_scaffold(cpp_dir, cpp_svc_name, 8112, "C++ Worker in Sandbox", dry_run=False)
+        generate_common_files(cpp_dir, cpp_svc_name, "cpp", 8112, "C++ Worker in Sandbox", dry_run=False)
+        generate_bdd_spec(self.mock_brain, cpp_svc_name, "C++ Worker in Sandbox", dry_run=False)
+
+        self.assertTrue((go_dir / "src/rest/contracts.go").exists())
+        self.assertTrue((py_dir / "src/rest/contracts.py").exists())
+        self.assertTrue((cpp_dir / "src/contracts/contracts.hpp").exists())
+
+        print("  ✅ STAGE 1 Complete: Go, Python, and C++ archetypes scaffolded successfully.")
 
         # ---------------------------------------------------------------------
         # STAGE 2: 12-Docker-Deployment-Standards.md Parity Check
         # ---------------------------------------------------------------------
         print("\n[STAGE 2] Auditing Container Architecture & Network Standards...")
 
-        for s_name, s_dir, s_lang in [(go_svc_name, go_dir, "go"), (py_svc_name, py_dir, "python")]:
+        for s_name, s_dir, s_lang in [(go_svc_name, go_dir, "go"), (py_svc_name, py_dir, "python"), (cpp_svc_name, cpp_dir, "cpp")]:
             dockerfile = (s_dir / "Dockerfile").read_text(encoding="utf-8")
             compose_yml = (s_dir / "docker-compose.yml").read_text(encoding="utf-8")
             compose_data = yaml.safe_load(compose_yml)
@@ -102,6 +114,10 @@ class TestScaffoldingScenario(unittest.TestCase):
             if s_lang == "go":
                 self.assertIn("FROM golang:1.25-alpine AS builder", dockerfile)
                 self.assertIn("FROM alpine:3.20", dockerfile)
+            elif s_lang == "cpp":
+                self.assertIn("FROM alpine:3.20 AS cpp-builder", dockerfile)
+                self.assertIn("FROM alpine:3.20", dockerfile)
+                self.assertIn("libdistconf.so", dockerfile)
             else:
                 self.assertIn("FROM golang:1.25-alpine AS go-builder", dockerfile)
                 self.assertIn("FROM python:3.12-alpine", dockerfile)
@@ -114,7 +130,7 @@ class TestScaffoldingScenario(unittest.TestCase):
         # ---------------------------------------------------------------------
         print("\n[STAGE 3] Auditing standalone.yaml Symlink & Self-Healing Contract...")
 
-        for s_dir in [go_dir, py_dir]:
+        for s_dir in [go_dir, py_dir, cpp_dir]:
             symlink = s_dir / "standalone.yaml"
             self.assertTrue(symlink.is_symlink())
             target = os.readlink(symlink)
