@@ -146,7 +146,7 @@ func TestRAGEngineStorage(t *testing.T) {
 			var k, val string
 			err := rows.Scan(&k, &val)
 			assert.NoError(t, err)
-			assert.True(t, len(val) > 4 && val[:4] == "ENC(", 
+			assert.True(t, len(val) > 4 && val[:4] == "ENC(",
 				"Secret key '%s' in database is NOT encrypted at rest! Stored value does not start with ENC(...)", k)
 			fmt.Printf(">>> Verified secret key '%s' is securely encrypted at rest: ENC(...)\n", k)
 		}

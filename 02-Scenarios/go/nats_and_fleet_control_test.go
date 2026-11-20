@@ -197,4 +197,3 @@ func TestScenario_PythonFleetOrchestratorIntegrity(t *testing.T) {
 	require.NoError(t, err)
 	assert.True(t, strings.Contains(string(cmdBytes), "fleet.py"), "fleet.cmd must route to fleet.py")
 }
-
