@@ -2,13 +2,19 @@
 # coding:utf-8
 
 """
-CORE PROCESS:
+ESSENTIAL PROCESS:
     Orchestrates complex test scenarios across the Bastien-Antigravity fleet.
     Supports both 'native' (local process) and 'docker' execution modes.
 
-DIAGRAM:
+DATA FLOW:
     [YAML Spec] -> [ScenarioRunner] -> [Start Services] -> [Run Implementation Tests] -> [Cleanup]
+
+KEY PARAMETERS:
+    - mode: Execution mode ('native' or 'docker').
+    - workspace_root: Root directory of the Bastien-Antigravity workspace.
 """
+
+# -----------------------------------------------------------------------------------------------
 
 import os
 import sys

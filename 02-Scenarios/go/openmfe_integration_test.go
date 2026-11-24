@@ -7,12 +7,45 @@ import (
 	"io"
 	"net/http"
 	"net/url"
+	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 	"time"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
+
+func TestCrossRepoOpenMFELifecycleParity(t *testing.T) {
+	workspaceRoot := resolveWorkspaceRoot(t)
+	mfeFiles := []struct {
+		service string
+		relPath string
+		tabsBar string
+	}{
+		{"config-server", filepath.Join("config-server", "src", "rest", "mfe.js"), "config-tabs-bar"},
+		{"watchdog-agent", filepath.Join("watchdog-agent", "src", "rest", "mfe.js"), "watchdog-tabs-bar"},
+		{"notif-server", filepath.Join("notif-server", "src", "rest", "mfe.js"), "notif-tabs-bar"},
+	}
+
+	for _, item := range mfeFiles {
+		fullPath := filepath.Join(workspaceRoot, item.relPath)
+		if _, err := os.Stat(fullPath); os.IsNotExist(err) {
+			t.Skipf("Sibling repository file %s not present in single-repo mode", fullPath)
+		}
+		raw, err := os.ReadFile(fullPath)
+		require.NoError(t, err)
+		content := string(raw)
+
+		assert.NotContains(t, content, "cdnjs.cloudflare.com", "%s MFE must not load external CDNs", item.service)
+		assert.Contains(t, content, `class="openmfe-container"`, "%s MFE must use .openmfe-container", item.service)
+		assert.NotContains(t, content, "renderSkeleton()", "%s MFE must use standard render()", item.service)
+		assert.Contains(t, content, "cacheDom()", "%s MFE must implement cacheDom()", item.service)
+		assert.Contains(t, content, item.tabsBar, "%s MFE must mount dynamic contract tabs", item.service)
+		assert.Contains(t, content, "loadContracts(", "%s MFE must invoke loadContracts()", item.service)
+	}
+}
 
 func TestOpenMFERegistrationScenario(t *testing.T) {
 	fmt.Println(">>> Scenario Test: Verifying OpenMFE Dynamic Microservice Registration & Routing")

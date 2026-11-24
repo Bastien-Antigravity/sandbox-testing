@@ -1,0 +1,21 @@
+# Feature: Flexible Logger Resilience, Throttled Drop Alerts & Canonical SSoT Schemas
+# Spec: [[02-Business-BDD/02-Behavior-Specs/flexible-logger/FEAT-023-Resilience-Alerts-SSoT]]
+# Implementation: 02-Scenarios/go/logger_resilience_and_alerts_test.go
+
+name: "Flexible Logger Resilience, Throttled Drop Alerts & Canonical SSoT Schemas"
+description: "End-to-end integration scenario validating AsyncSink buffer-drop Telegram alert throttling, SSoT Cap'n Proto zero-copy wire compatibility, and bounded shutdown drain timeout."
+version: "1.0.0"
+
+steps:
+  - name: "Verify Throttled Telegram Drop Alerts Under Buffer Saturation"
+    description: "Ensure saturating the AsyncSink queue emits at most 1 warning alert per 60s window with tag telegram and accurate drop count."
+    step: "02-Scenarios/go/logger_resilience_and_alerts_test.go::TestLoggerResilience_ThrottledTelegramDropAlert"
+
+  - name: "Verify Canonical SSoT Cap'n Proto Wire Serialization"
+    description: "Ensure log entries serialized via microservice-toolbox SSoT schema deserialize with zero field corruption across network sockets."
+    step: "02-Scenarios/go/logger_resilience_and_alerts_test.go::TestLoggerResilience_CanonicalSchemaRoundtrip"
+
+  - name: "Verify Bounded Shutdown Drain Timeout"
+    description: "Ensure AsyncSink.Close() unblocks and exits within the configured bounded drain timeout when downstream writers stall."
+    step: "02-Scenarios/go/logger_resilience_and_alerts_test.go::TestLoggerResilience_BoundedDrainTimeoutShutdown"
+

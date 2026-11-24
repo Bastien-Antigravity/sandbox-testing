@@ -4,14 +4,14 @@ go 1.25.8
 
 require (
 	capnproto.org/go/capnp/v3 v3.1.0-alpha.2
-	github.com/Bastien-Antigravity/distributed-config v1.9.922
-	github.com/Bastien-Antigravity/flexible-logger v0.0.1
-	github.com/Bastien-Antigravity/microservice-toolbox v0.0.1
-	github.com/Bastien-Antigravity/notif-server v0.0.1
-	github.com/Bastien-Antigravity/safe-socket v1.8.2
-	github.com/Bastien-Antigravity/universal-logger v0.0.1
-	github.com/Bastien-Antigravity/watchdog-agent v0.0.0-00010101000000-000000000000
-	github.com/Bastien-Antigravity/web-interface v0.0.0-00010101000000-000000000000
+	github.com/Bastien-Antigravity/distributed-config v0.0.2-0.20261124065914-695bfba252e6
+	github.com/Bastien-Antigravity/flexible-logger v0.0.2-0.20261124065928-cc391d3e890a
+	github.com/Bastien-Antigravity/microservice-toolbox v0.0.2-0.20261124065922-5ac029d74c96
+	github.com/Bastien-Antigravity/notif-server v0.0.2-0.20261124073433-ed7c0da44588
+	github.com/Bastien-Antigravity/safe-socket v0.0.2-0.20261123230542-2a4f4de20a0f
+	github.com/Bastien-Antigravity/universal-logger v0.0.2-0.20261124065917-5ef716c67f07
+	github.com/Bastien-Antigravity/watchdog-agent v0.0.2-0.20261124073434-edf50256b999
+	github.com/Bastien-Antigravity/web-interface v0.0.2-0.20261124073434-642075aa15a1
 	github.com/alexedwards/scs/v2 v2.9.0
 	github.com/lib/pq v1.11.2
 	github.com/nats-io/nats.go v1.52.0
@@ -52,16 +52,4 @@ require (
 	modernc.org/libc v1.72.3 // indirect
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.11.0 // indirect
-)
-
-replace (
-	github.com/Bastien-Antigravity/config-server => ../../../config-server
-	github.com/Bastien-Antigravity/distributed-config => ../../../distributed-config
-	github.com/Bastien-Antigravity/flexible-logger => ../../../flexible-logger
-	github.com/Bastien-Antigravity/microservice-toolbox => ../../../microservice-toolbox
-	github.com/Bastien-Antigravity/notif-server => ../../../notif-server
-	github.com/Bastien-Antigravity/safe-socket => ../../../safe-socket
-	github.com/Bastien-Antigravity/universal-logger => ../../../universal-logger
-	github.com/Bastien-Antigravity/watchdog-agent => ../../../watchdog-agent
-	github.com/Bastien-Antigravity/web-interface => ../../../web-interface
 )

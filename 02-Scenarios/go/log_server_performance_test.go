@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"capnproto.org/go/capnp/v3"
-	logger_schemas "github.com/Bastien-Antigravity/flexible-logger/src/schemas/capnp/logger"
+	logger_schemas "github.com/Bastien-Antigravity/microservice-toolbox/go/pkg/schemas/logger"
 	socket_schemas "github.com/Bastien-Antigravity/safe-socket/src/schemas"
 	"github.com/stretchr/testify/assert"
 )
